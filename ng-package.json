@@ -1,0 +1,6 @@
+{
+    "dest": "dist-lib",
+    "lib": {
+        "entryFile": "src/ng-form-engine/src/public_api.ts"
+    }
+}
