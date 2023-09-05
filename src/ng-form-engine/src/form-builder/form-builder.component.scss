@@ -1,0 +1,63 @@
+.fe-container {
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+.fe-editor {
+    font-family: Helvetica, sans-serif;
+    font-size: .75rem;
+    position: relative;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.fe-two-color {
+    color: #b9a5a6;
+}
+
+.fe-one-bg {
+    background-color: #463a3c;
+}
+
+.fe-canvas {
+    box-sizing: border-box;
+    width: 85%;
+    height: calc(100% - 40px);
+    bottom: 0;
+    overflow: hidden;
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    top: 40px;
+}
+
+.fe-pn-panel {
+    display: inline-block;
+    position: absolute;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 5px;
+    z-index: 3;
+}
+
+.fe-pn-options {
+    right: 15%;
+    top: 0;
+}
+
+.fe-pn-views {
+    border-bottom: 2px solid rgba(0, 0, 0, .2);
+    right: 0;
+    width: 15%;
+    z-index: 4;
+}
+
+.fe-pn-views-container {
+    height: calc(100% - 150px);
+    padding: 42px 0 0;
+    right: 0;
+    width: 15%;
+    overflow: auto;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+}
