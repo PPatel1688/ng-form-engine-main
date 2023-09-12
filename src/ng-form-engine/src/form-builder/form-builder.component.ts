@@ -1,6 +1,5 @@
-import { Component, HostListener, forwardRef, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
-import { NG_VALUE_ACCESSOR, ControlValueAccessor } from "@angular/forms";
-import Editor from "../common/editor";
+import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
+import Frame from "../common/frame";
 
 import template from "../assets/template";
 
@@ -17,7 +16,7 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
-    _editor: any = null;
+    _frame: any = null;
     _onChangeSubscription: any = null;
 
     getFrameEl() {
@@ -57,7 +56,7 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     constructor() {
-        this._editor = new Editor();
+        this._frame = new Frame();
     }
 
     ngOnInit() {
@@ -70,8 +69,8 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
 
     _initializeEditor() {
         let that = this;
-        that._editor.initEditor(this.refFrame?.nativeElement);
-        that._onChangeSubscription = this._editor.onChange.subscribe({
+        that._frame.initFrame(this.refFrame?.nativeElement);
+        that._onChangeSubscription = this._frame.onChange.subscribe({
             next: (event: any) => {
                 that._onEditorChange(event);
             }
@@ -166,8 +165,6 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
         this.nePlaceHolder.style.display = data.display;
         let element = data.clientRect;
         if(element) {
-
-            //console.log("element", JSON.stringify(element));
             let placeholder = this.nePlaceHolder.getElementsByClassName("fe-placeholder")[0] as HTMLElement;
             placeholder.classList.add(data.class);
             if(data.class == "vertical") {
@@ -187,23 +184,23 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     onDelete(event: any) {
-        this._editor.DeleteSelected(event);
+        this._frame.DeleteSelected(event);
     }
 
     onCopy(event: any) {
-        this._editor.CopySelected(event);
+        this._frame.CopySelected(event);
     }
 
     onMove(event: any) {
-        this._editor.MoveSelected(event);
+        this._frame.MoveSelected(event);
     }
 
     onSelectParent(event: any) {
-        this._editor.SelectParent(event);
+        this._frame.SelectParent(event);
     }
 
     ngOnDestroy() {
         this._onChangeSubscription.unsubscribe();
-        this._editor.destroy();
+        this._frame.destroy();
     }
 }

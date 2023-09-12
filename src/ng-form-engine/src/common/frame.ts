@@ -1,14 +1,14 @@
 import { EventEmitter } from "@angular/core";
 
 
-export class EditorEvent {
+export class FrameEvent {
     element: string = "";
     action: string = "";
     data: any;
 }
 
-export default class Editor {
-    public onChange: EventEmitter<EditorEvent> = new EventEmitter<EditorEvent>();
+export default class Frame {
+    public onChange: EventEmitter<FrameEvent> = new EventEmitter<FrameEvent>();
 
     frame: any = null;
     document: any = null;
@@ -21,7 +21,7 @@ export default class Editor {
     constructor() {
     }
 
-    initEditor(el: HTMLIFrameElement) {
+    initFrame(el: HTMLIFrameElement) {
         this.frame = el;
         this.document = el?.contentDocument as Document;
         this._BindDocEvents();
@@ -237,9 +237,7 @@ export default class Editor {
             this.selected = null;
         }
     }
-
-
-
+    
     destroy() {
         this._UnbindDocEvents();
     }
