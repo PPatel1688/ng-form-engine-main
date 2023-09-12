@@ -13,14 +13,14 @@
 }
 
 .fe-two-color {
-    color: #b9a5a6;
+    color: #fff;
 }
 
 .fe-one-bg {
-    background-color: #463a3c;
+    background-color: #39B566;
 }
 
-.fe-canvas {
+.fe-cv-canvas {
     box-sizing: border-box;
     width: 85%;
     height: calc(100% - 40px);
@@ -32,6 +32,45 @@
     top: 40px;
 }
 
+.fe-cv-canvas * {
+    box-sizing: border-box;
+}
+.fe-cv-canvas__frames {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(1) translate(0px, 0px);
+}
+
+.fe-frame-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.fe-frame {
+    outline: medium none;
+    height: 100%;
+    width: 100%;
+    border: none;
+    margin: auto;
+    display: block;
+    transition: width .35s ease,height .35s ease;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.fe-cv-canvas-bg {
+    background-color: rgba(0,0,0,.15);
+}
+
 .fe-pn-panel {
     display: inline-block;
     position: absolute;
@@ -39,6 +78,17 @@
     text-align: center;
     padding: 5px;
     z-index: 3;
+}
+
+.fe-pn-commands {
+    width: 85%;
+    left: 0;
+    top: 0;
+    box-shadow: 0 0 5px rgba(0,0,0,.2);
+}
+
+.fe-pn-height {
+    height: 40px;
 }
 
 .fe-pn-options {
@@ -54,10 +104,133 @@
 }
 
 .fe-pn-views-container {
-    height: calc(100% - 150px);
+    height: 100%;
     padding: 42px 0 0;
     right: 0;
     width: 15%;
     overflow: auto;
     box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+}
+
+.fe-pn-buttons {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.fe-pn-btn {
+    box-sizing: border-box;
+    min-height: 30px;
+    min-width: 30px;
+    line-height: 21px;
+    background-color: rgba(0,0,0,0);
+    border: none;
+    font-size: 18px;
+    margin-right: 5px;
+    border-radius: 2px;
+    padding: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.fe-tools {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    outline: none;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+}
+
+.fe-tools .fe-highlighter {
+    position: absolute;
+    outline: 1px solid #3b97e3;
+    outline-offset: -1px;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+}
+
+.fe-tools .fe-badge {
+    pointer-events: none;
+    background-color: #3b97e3;
+    color: #fff;
+    padding: 2px 5px;
+    position: absolute;
+    z-index: 1;
+    font-size: 12px;
+    outline: none;
+    display: none;
+}
+
+.fe-tools .fe-badge .fe-badge__name {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.fe-tools .fe-toolbar {
+    position: absolute;
+    background-color: #3b97e3;
+    white-space: nowrap;
+    color: #fff;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    pointer-events: all;
+}
+
+.fe-tools .fe-ghost {
+    pointer-events: none;
+    background-color: #5b5b5b;
+    border: 2px dashed #ccc;
+    position: absolute;
+    z-index: 10;
+    opacity: .55;
+}
+
+.fe-tools .fe-toolbar .fe-toolbar-items .fe-toolbar-item {
+    width: 26px;
+    padding: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.fe-tools .fe-toolbar .fe-toolbar-items .fe-no-touch-actions {
+    touch-action: none;
+}
+
+
+.fe-tools .fe-placeholder {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    border-style: solid !important;
+    outline: none;
+    box-sizing: border-box;
+    transition: top .2s,left .2s,width .2s,height .2s;
+} 
+
+.fe-tools .fe-placeholder .fe-placeholder-int {
+    background-color: #62c462;
+    box-shadow: 0 0 3px rgba(0,0,0,.2);
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    padding: 1.5px;
+    outline: none;
+}
+
+.fe-tools .fe-placeholder.horizontal {
+    border-color: rgba(0,0,0,0) #62c462;
+    border-width: 3px 5px;
+    margin: -3px 0 0;
+}
+
+.fe-tools .fe-placeholder.vertical {
+    border-color: #62c462 rgba(0,0,0,0);
+    border-width: 5px 3px;
+    margin: 0 0 0 -3px;
 }
