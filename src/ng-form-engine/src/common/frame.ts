@@ -13,6 +13,12 @@ export default class Frame {
     frame: any = null;
     document: any = null;
 
+    drag: any = {
+        parent: null,
+        target: null,
+        append: null
+    }
+
     parent: any = null;
     dragArea: any = null;
     selected: any = null;
@@ -96,107 +102,113 @@ export default class Frame {
     }
 
     private _onDocDragOver(event: any) {
-        let data: any = {
-            clientRect: null,
-            display: "none",
-            class: "horizontal"
+        if (this.drag.parent) {
+            this.drag.parent.classList.remove("fe-selected-parent");
         }
-        if (this.parent) {
-            this.parent.classList.remove("fe-selected-parent");
+        if (event.target.getAttribute('draggable') === "true") {
+            let drag = this._prepareDrag(event);
+            this.drag.parent = drag.parent;
+            this.drag.target = drag.target;
+            this.drag.append = drag.append;
+            this.drag.parent.classList.add("fe-selected-parent");
+            this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
+            this.onChange.emit({ element: "placeholder", action: "update", data: drag.style });
+        } else {
+            this.onChange.emit({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
         }
-       
-        this.parent = event.target;
-
-        let isValid = this._isValidDragArea(event);
-        if(!isValid) {
-            this.parent = event.target.parentElement;
-        }
-        this.parent.classList.add("fe-selected-parent");
-
-        let source = this._getBoundingClientRect(this.parent, event.target);
-        this.dragArea = source.dragArea;
-        data.class = source.class;
-        data.clientRect = source.clientRect;
-        data.display = "block";
-
-        this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-        this.onChange.emit({ element: "placeholder", action: "update", data: data });
         event.preventDefault();
     }
 
     private _onDocDrop(event: any) {
-        console.log("drop");
-        if (this.parent) {
-            this.parent.classList.remove("fe-selected-parent");
+        if (this.drag.parent) {
+            this.drag.parent.classList.remove("fe-selected-parent");
         }
         this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
         this.onChange.emit({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
-        if (this.dragArea && this.dragArea.getAttribute('draggable') === "true" ) {
+        if (this.drag && this.drag.target.getAttribute('draggable') === "true") {
             let data = event.dataTransfer.getData("text");
             if (data) {
                 let element = this.document.getElementById(data);
-                this.dragArea.appendChild(element);
+                this.drag.target.appendChild(element);
                 element.classList.remove("fe-freezed");
                 element.click();
             }
         }
-        this.parent = null;
-        this.dragArea = null;
-
+        this.drag.parent = null;
+        this.drag.target = null;
+        this.drag.append = null;
     }
 
-    private _isValidDragArea(event: any) {
+    private _isValidPlace(sourceType: any, targetType: any) {
+        let isInvalid = false;
+        switch (sourceType) {
+            case "Row":
+            case "Cell":
+                isInvalid = targetType == sourceType;
+                break;
+            case "Text":
+                isInvalid = targetType == "Row";
+                break;
+            default:
+                break;
+        }
+        return isInvalid;
+    }
+
+    private _prepareDrag(event: any) {
+        let data: any = {
+            parent: null,
+            style: {
+                clientRect: null,
+                display: "block",
+                class: "horizontal"
+            },
+            target: null,
+            append: null
+        };
         let source = this.selected;
         let sourceType = source.getAttribute('data-fe-type');
 
         let target = event.target;
         let targetType = target.getAttribute('data-fe-type');
 
-        let isValid = true;
-        switch (sourceType) {
-            case "Cell":
-                if (targetType == "Cell") {
-                    isValid = false;
-                }
-                break;
-            case "Row":
-                if (targetType == "Row") {
-                    isValid = false;
-                }
-                break;
+        let isSameType = this._isValidPlace(sourceType, targetType);
+        if(isSameType) {
+            data.parent = target.parentElement;
+            data.target = target.parentElement;
+        } else {
+            data.parent = target;
+            data.target = target;
         }
-        return isValid;
-    }
-
-    private _getBoundingClientRect(parent: any, target: any) {
-        let data: any = {
-            class: "horizontal",
-            clientRect: null,
-            dragArea: parent
-            
-        };
-        let clientRect = parent.getBoundingClientRect();
-        if(parent.children.length >  0) {
+        let hasChild = false;
+        let parentType = data.parent.getAttribute('data-fe-type');
+        if(parentType != "Wrapper") {
+            hasChild = data.target.children.length > 0;
+            if (hasChild) {
+                data.style.class = "vertical";
+            }
+        }
+        
+        let clientRect = data.target.getBoundingClientRect();
+        if (hasChild) {
             clientRect = target.getBoundingClientRect();
-            let targetType = target.getAttribute('data-fe-type');
-            if(targetType == "Row") {
-                data.clientRect = {
+            if (targetType == "Row") {
+                data.style.clientRect = {
                     top: clientRect.top + 5,
                     left: clientRect.left + 10,
                     width: "auto",
                     height: clientRect.height - 10
                 };
             } else {
-                data.clientRect = {
+                data.style.clientRect = {
                     top: clientRect.top - 5,
                     left: clientRect.left,
                     width: "auto",
                     height: clientRect.height + 10
                 };
             }
-            data.class = "vertical";
         } else {
-            data.clientRect = {
+            data.style.clientRect = {
                 top: clientRect.top + 5,
                 left: clientRect.left + 5,
                 width: clientRect.width - 10,
@@ -225,8 +237,7 @@ export default class Frame {
     MoveSelected(event: any) {
         if (this.selected) {
             event.dataTransfer.setData("text", this.selected.id);
-            //this.selected.classList.add("fe-freezed");
-            //this.selected = null;
+            this.selected.classList.add("fe-freezed");
         }
     }
 
@@ -237,7 +248,7 @@ export default class Frame {
             this.selected = null;
         }
     }
-    
+
     destroy() {
         this._UnbindDocEvents();
     }

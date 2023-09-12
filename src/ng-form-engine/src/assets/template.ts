@@ -92,18 +92,29 @@ const template = `
             flex-grow: 1;
             flex-basis: 100%;
         }
+
+        [data-fe-type="Wrapper"] {
+            min-height: 100vh;
+            padding-top: 0.001em;
+        }
     </style>
 </head>
 <body class="fe-dashed" data-fe-type="Body">
-    <div id="iud7" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
-        <div id="ivdu" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">1</div>
-        <div id="i32z" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">2</div>
-        <div id="i32o" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">3</div>
+    <div data-fe-highlightable="true" id="ivjz" data-fe-type="Wrapper" class="" draggable="true">
+        <div id="iud7" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
+            <div id="ivdu" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">1</div>
+            <div id="i32z" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">2</div>
+            <div id="i32o" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">3</div>
+        </div>
+        <div id="iuv4" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
+            <div id="i32P" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">
+                <div data-fe-highlightable="true" id="iavs" data-fe-type="Text" draggable="false" contenteditable="true">Insert your text here</div>
+            </div>
+        </div>
+        <div id="iuv9" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
+
+        </div>
     </div>
-    <div id="iuv4" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
-        <div id="i32P" data-fe-highlightable="true" data-fe-type="Cell" draggable="true" class="fe-cell">4</div>
-    </div>
-    <div id="iuv9" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row"></div>
 </body>
 </html>
 `;
