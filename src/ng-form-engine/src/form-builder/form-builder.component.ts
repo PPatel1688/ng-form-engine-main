@@ -1,7 +1,5 @@
 import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
-import Frame from "../common/frame";
-
-import template from "../assets/template";
+import FrameWrapper from "../common/frameWrapper";
 
 @Component({
     selector: "ng-form-builder",
@@ -11,40 +9,15 @@ import template from "../assets/template";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
-    @ViewChild('refFrame') refFrame?: ElementRef<HTMLIFrameElement>;
-    @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<HTMLIFrameElement>;
+    @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<any>;
     @ViewChild('refPlaceHolder') refPlaceHolder?: ElementRef<any>;
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
-    _frame: any = null;
+    _frameWrapper: any = null;
     _onChangeSubscription: any = null;
-    _toolBarAction: any = null;
-    _blockToolAction: any = null;
-
-    getFrameEl() {
-        return this.refFrame?.nativeElement as HTMLIFrameElement;
-    }
-
-    getDocument() {
-        const frame = this.getFrameEl();
-        return frame?.contentDocument as Document;
-    }
-
-    getHead() {
-        const document = this.getDocument();
-        return document.getElementsByTagName("head")[0];
-    }
-
-    getBody() {
-        const document = this.getDocument();
-        return document.getElementsByTagName("body")[0];
-    }
-
-    getHTMLAllCollection() {
-        const document = this.getDocument();
-        return document?.all as HTMLAllCollection;
-    }
+    _toolBarAction: any = "block";
+    _blockToolAction: any = "basic";
 
     get nePlaceHolder() {
         return this.refPlaceHolder?.nativeElement as HTMLElement;
@@ -58,8 +31,16 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.refToolBar?.nativeElement as HTMLElement;
     }
 
+    public get isStyleTool() {
+        return this._toolBarAction == "style";
+    }
+
+    public get isBlockTool() {
+        return this._toolBarAction == "block";
+    }
+
     constructor() {
-        this._frame = new Frame();
+        this._frameWrapper = new FrameWrapper();
     }
 
     ngOnInit() {
@@ -72,43 +53,12 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
 
     _initializeEditor() {
         let that = this;
-        that._frame.initFrame(this.refFrame?.nativeElement);
-        that._onChangeSubscription = this._frame.onChange.subscribe({
-            next: (event: any) => {
+        that._frameWrapper.initFrame(this.refFrameWrapper?.nativeElement);
+        that._onChangeSubscription = that._frameWrapper.onChange.subscribe((event: any) => { 
+            if(event) {
                 that._onEditorChange(event);
             }
         });
-
-        const domParser = new DOMParser();
-        const source = domParser.parseFromString(template, 'text/html');
-        const head1 = source.getElementsByTagName("head");
-        const body1 = source.getElementsByTagName("body");
-
-
-        const document = this.getDocument();
-        
-        const head = this.getHead();
-        const body = this.getBody();
-
-        for (let child of this._getChildren(head1[0])) {
-            head.appendChild(child);
-        }
-
-        for (let attributes of this._getAttributes(body1[0])) {
-            body.setAttribute(attributes.nodeName, attributes.nodeValue || "");
-        }
-
-        for (let child of this._getChildren(body1[0])) {
-            body.appendChild(child);
-        }
-    }
-
-    _getChildren(dom: any) {
-        return dom ? Array.from(dom.children as HTMLCollection) : [];
-    }
-
-    _getAttributes(dom: any) {
-        return dom ? Array.from(dom.attributes as NamedNodeMap) : [];
     }
 
     /**************************/
@@ -123,10 +73,12 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
             case "placeholder":
                 this._setPlaceHolderStyle(event.data);
                 break;
+            case "selected":
+                //this.onToolbarAction('style');
+                break;
             default:
                 break;
         }
-        //console.log("event", event);
     }
 
     _setToolbarStyle(data: any) {
@@ -185,30 +137,34 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
     }
+    /**************************/
 
     onDelete(event: any) {
-        this._frame.DeleteSelected(event);
+        this._frameWrapper.DeleteSelected(event);
     }
 
     onCopy(event: any) {
-        this._frame.CopySelected(event);
+        this._frameWrapper.CopySelected(event);
     }
 
     onMove(event: any, block: any) {
-        this._frame.MoveSelected(event, block);
+        this._frameWrapper.MoveSelected(event, block);
+    }
+
+    onSetting(event: any) {
+        this.onToolbarAction('style');
     }
 
     onSelectParent(event: any) {
-        this._frame.SelectParent(event);
+        this._frameWrapper.SelectParent(event);
     }
 
     onToolbarAction(action: any) {
         this._toolBarAction = action;
-        this._blockToolAction = null;
     }
 
     ngOnDestroy() {
         this._onChangeSubscription.unsubscribe();
-        this._frame.destroy();
+        this._frameWrapper.destroy();
     }
 }

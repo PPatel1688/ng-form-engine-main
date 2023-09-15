@@ -19,6 +19,16 @@ export default class Mixins {
         CheckboxList: "ctrCheckboxList"
     }
 
+    public ctrMainWrapper() {
+        let id = this.getNewId();
+        let source = this.document.createElement("div");
+        source.setAttribute("id", id);
+        source.setAttribute("data-fe-highlightable", "true");
+        source.setAttribute("data-fe-type", "Wrapper");
+        source.setAttribute("draggable", "true");
+        return source;
+    }
+
     /********/
 
     public ctrOneColumn() {

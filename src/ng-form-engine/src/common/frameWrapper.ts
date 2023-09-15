@@ -1,6 +1,8 @@
 import { EventEmitter } from "@angular/core";
 
+import { HTMLTemplate, StyleHTML, StyleBuilder } from "../assets/template";
 import Mixins from "./mixins";
+import { BehaviorSubject } from "rxjs";
 
 export class FrameEvent {
     element: string = "";
@@ -8,8 +10,9 @@ export class FrameEvent {
     data: any;
 }
 
-export default class Frame extends Mixins {
-    public onChange: EventEmitter<FrameEvent> = new EventEmitter<FrameEvent>();
+export default class FrameWrapper extends Mixins {
+    //public onChange: EventEmitter<FrameEvent> = new EventEmitter<FrameEvent>();
+    public onChange = new BehaviorSubject<any>(null);
 
     drag: any = {
         parent: null,
@@ -26,10 +29,37 @@ export default class Frame extends Mixins {
         super();
     }
 
-    initFrame(el: HTMLIFrameElement) {
-        this.frame = el;
-        this.document = el?.contentDocument as Document;
+    initFrame(el: any, source: any = null) {
+        this.frame = el.getElementsByTagName("iframe")[0];
+        this.document = this.frame?.contentDocument as Document;
+        this._RenderDocument(source);
         this._BindDocEvents();
+    }
+
+    _RenderDocument(source: any) {
+        let isDefault = source ? false : true;
+        let template = new DOMParser().parseFromString(source || HTMLTemplate, 'text/html');;
+
+        if(isDefault) {
+            let styleHTML = template.createElement("style");
+            styleHTML.innerText = StyleHTML.replace(/(\r\n|\n|\r)/gm, "");
+            this.document.head.appendChild(styleHTML);
+            
+            let styleBuilder = template.createElement("style");
+            styleBuilder.innerText = StyleBuilder.replace(/(\r\n|\n|\r)/gm, "");
+            styleBuilder.setAttribute("data-style", "system");
+            this.document.head.appendChild(styleBuilder);
+
+            let wrapper = this.ctrMainWrapper();
+            this.document.body.appendChild(wrapper);
+            
+            this.document.body.setAttribute("data-fe-type", "Body");
+            this.document.body.classList.add("fe-dashed");
+        } else {
+            let styleBuilder = template.createElement("style");
+            styleBuilder.innerText = StyleBuilder.replace(/(\r\n|\n|\r)/gm, "");
+            this.document.head.appendChild(styleBuilder);
+        }
     }
 
     private _BindDocEvents() {
@@ -66,8 +96,9 @@ export default class Frame extends Mixins {
 
             data.clientRect = this.selected.getBoundingClientRect();
             data.display = "block";
+            this.onChange.next({ element: "selected", action: "update", data: null });
         }
-        this.onChange.emit({ element: "toolbar", action: "update", data: data });
+        this.onChange.next({ element: "toolbar", action: "update", data: data });
     }
 
     private _onDocMouseOver(event: any) {
@@ -89,7 +120,7 @@ export default class Frame extends Mixins {
                 data.display = "block";
             }
         }
-        this.onChange.emit({ element: "hoverframe", action: "update", data: data });
+        this.onChange.next({ element: "hoverframe", action: "update", data: data });
     }
 
     private _onDocMouseOut(event: any) {
@@ -102,7 +133,7 @@ export default class Frame extends Mixins {
             this.hovered.classList.remove("fe-hovered");
         }
         this.hovered = null;
-        this.onChange.emit({ element: "hoverframe", action: "update", data: data });
+        this.onChange.next({ element: "hoverframe", action: "update", data: data });
     }
 
     private _onDocDragOver(event: any) {
@@ -117,13 +148,13 @@ export default class Frame extends Mixins {
                 this.drag.target = drag.target;
                 this.drag.append = drag.append;
                 this.drag.parent.classList.add("fe-selected-parent");
-                this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-                this.onChange.emit({ element: "placeholder", action: "update", data: drag.style });
+                this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
+                this.onChange.next({ element: "placeholder", action: "update", data: drag.style });
             } else {
-                this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
+                this.onChange.next({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
             }
         } else {
-            this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
+            this.onChange.next({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
         }
         event.preventDefault();
     }
@@ -132,8 +163,8 @@ export default class Frame extends Mixins {
         if (this.drag.parent) {
             this.drag.parent.classList.remove("fe-selected-parent");
         }
-        this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
-        this.onChange.emit({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
+        this.onChange.next({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
+        this.onChange.next({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
         if (this.selected && this.drag.target && this.drag.target.getAttribute('draggable') === "true") {
             let data = event.dataTransfer.getData("text");
             if (data) {
@@ -176,10 +207,12 @@ export default class Frame extends Mixins {
         const parent = event.target.parentElement;
         let parentType = parent.getAttribute('data-fe-type');
 
-        if (parentType == "Body") {
-            return null;
-        }
         //console.log("type", sourceType, targetType, parentType);
+
+        if (parentType == "Body") {
+            //return null;
+        }
+        
         let data: any = { target: target, parent: parent, style: { clientRect: null, display: "block", class: "horizontal" } };
         let current: any = null;
         let currentType: any = null;
@@ -246,13 +279,12 @@ export default class Frame extends Mixins {
                 };
             }
         }
-        /*console.log("----------");
-        console.log("className", className);
-        console.log("currentType", currentType);
-        console.log("----------");*/
+        //console.log("----------");
+        //console.log("className", className);
+        //console.log("currentType", currentType);
+        //console.log("----------");
         data.target = current;
         data.style.class = className;
-
         return data;
     }
 
@@ -286,15 +318,13 @@ export default class Frame extends Mixins {
                 that.selected.classList.remove("fe-selected");
             }
             that.selected = that[that.blockType[block]]();
-
-            console.log(that.selected);
             event.dataTransfer.setData("text", that.selected.id || that.selected.for);
         }
     }
 
     DeleteSelected(event: any) {
         if (this.selected) {
-            this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
+            this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
             this.selected.remove();
             this.selected = null;
         }
