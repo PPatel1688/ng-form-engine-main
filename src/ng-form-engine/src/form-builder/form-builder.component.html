@@ -6,6 +6,9 @@
                     <div class="fe-frame-wrapper">
                         <iframe #refFrame allowfullscreen="allowfullscreen" class="fe-frame"></iframe>
                     </div>
+                    <div class="fe-frame-wrapper" #refFrameWrapper>
+                       
+                    </div>
                 </div>
             </div>
             <div class="fe-canvas-tools" data-tools>
@@ -29,7 +32,7 @@
                             <div class="fe-toolbar-item"(click)="onSelectParent($event)">
                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"></path></svg>
                             </div>
-                            <div class="fe-toolbar-item fe-no-touch-actions" (dragstart)="onMove($event)" draggable="true">
+                            <div class="fe-toolbar-item fe-no-touch-actions" (dragstart)="onMove($event, 'self')" draggable="true">
                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z"></path></svg>
                             </div>
                             <div class="fe-toolbar-item" (click)="onCopy($event)">
@@ -51,8 +54,125 @@
                     </span>
                 </div>
             </div>
-            <div class="fe-pn-panel fe-pn-views fe-pn-height fe-one-bg fe-two-color"></div>
-            <div class="fe-pn-panel fe-pn-views-container fe-one-bg fe-two-color"></div>
+            <div class="fe-pn-panel fe-pn-views fe-pn-height fe-one-bg fe-two-color">
+                <div class="fe-pn-buttons">
+                    <span title="Open Style Manager" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{'fe-pn-active': _toolBarAction == 'style' }" (click)="onToolbarAction('style')">
+                        <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"></path></svg>
+                    </span>
+                    <!--<span title="Open Layer Manager" data-tooltip-pos="bottom" class="fe-pn-btn">
+                        <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z"></path></svg>
+                    </span>-->
+                    <span title="Open Blocks" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{'fe-pn-active': _toolBarAction == 'block' }" (click)="onToolbarAction('block')">
+                        <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H13V17H11V13H7V11H11V7H13V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"></path></svg>
+                    </span>
+                </div>
+            </div>
+            <div class="fe-pn-panel fe-pn-views-container fe-one-bg fe-two-color">
+                <div *ngIf="_toolBarAction == 'block'">
+                    <div class="fe-blocks-cs fe-one-bg fe-two-color">
+                        <div class="fe-block-categories">
+                            <div class="fe-block-category">
+                                <div class="fe-title" data-title="" (click)="_blockToolAction = 'basic'">
+                                    Basic
+                                </div>
+                                <div class="fe-blocks-c" *ngIf="_blockToolAction == 'basic'">
+                                    <div class="fe-block" title="1 Column" draggable="true" (dragstart)="onMove($event, 'OneColumn')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M2 20h20V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h20a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1Z"></path></svg>
+                                        </div>
+                                        <div class="fe-block-label">1 Column</div>
+                                    </div>
+                                    <div class="fe-block" title="2 Columns" draggable="true" (dragstart)="onMove($event, 'TwoColumn')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 23 24"> <path fill="currentColor" d="M2 20h8V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1ZM13 20h8V4h-8v16Zm-1 0V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1Z"></path> </svg>
+                                        </div>
+                                        <div class="fe-block-label">2 Columns</div>
+                                    </div>
+                                    <div class="fe-block" title="3 Columns" draggable="true" (dragstart)="onMove($event, 'ThreeColumn')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 23 24"> <path fill="currentColor" d="M2 20h4V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1ZM17 20h4V4h-4v16Zm-1 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1ZM9.5 20h4V4h-4v16Zm-1 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1Z"></path> </svg>
+                                        </div>
+                                        <div class="fe-block-label">3 Columns</div>
+                                    </div>
+                                    <div class="fe-block" title="2 Columns 3/7" draggable="true" (dragstart)="onMove($event, 'TwoThirdColumn')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 24 24"> <path fill="currentColor" d="M2 20h5V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1ZM10 20h12V4H10v16Zm-1 0V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1Z"></path> </svg>
+                                        </div>
+                                        <div class="fe-block-label">2 Columns 3/7</div>
+                                    </div>
+                                    <div class="fe-block" title="Text" draggable="true" (dragstart)="onMove($event, 'Text')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 24 24"> <path fill="currentColor" d="M18.5,4L19.66,8.35L18.7,8.61C18.25,7.74 17.79,6.87 17.26,6.43C16.73,6 16.11,6 15.5,6H13V16.5C13,17 13,17.5 13.33,17.75C13.67,18 14.33,18 15,18V19H9V18C9.67,18 10.33,18 10.67,17.75C11,17.5 11,17 11,16.5V6H8.5C7.89,6 7.27,6 6.74,6.43C6.21,6.87 5.75,7.74 5.3,8.61L4.34,8.35L5.5,4H18.5Z"></path> </svg>
+                                        </div>
+                                        <div class="fe-block-label">Text</div>
+                                    </div>
+                                    <div class="fe-block" title="Paragraph" draggable="true" (dragstart)="onMove($event, 'Paragraph')">
+                                        <div class="fe-block__media">
+                                            
+                                        </div>
+                                        <div class="fe-block-label">Paragraph</div>
+                                    </div>
+                                    <div class="fe-block" title="Image" draggable="true" (dragstart)="onMove($event, 'Image')">
+                                        <div class="fe-block__media">
+                                            <svg viewBox="0 0 24 24"> <path fill="currentColor" d="M21,3H3C2,3 1,4 1,5V19A2,2 0 0,0 3,21H21C22,21 23,20 23,19V5C23,4 22,3 21,3M5,17L8.5,12.5L11,15.5L14.5,11L19,17H5Z"></path> </svg>
+                                        </div>
+                                        <div class="fe-block-label">Image</div>
+                                    </div>
+                                    <div class="fe-block" title="Table" draggable="true" (dragstart)="onMove($event, 'Table')">
+                                        <div class="fe-block__media">
+                                            
+                                        </div>
+                                        <div class="fe-block-label">Table</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fe-block-category">
+                                <div class="fe-title" data-title="" (click)="_blockToolAction = 'forms'">
+                                    Forms
+                                </div>
+                                <div class="fe-blocks-c" *ngIf="_blockToolAction == 'forms'">
+                                    <div class="fe-block" title="Input" draggable="true" (dragstart)="onMove($event, 'Input')">
+                                        <div class="fe-block__media">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 9c0-.6-.5-1-1.3-1H3.4C2.5 8 2 8.4 2 9v6c0 .6.5 1 1.3 1h17.4c.8 0 1.3-.4 1.3-1V9zm-1 6H3V9h18v6z"></path><path d="M4 10h1v4H4z"></path></svg>
+                                        </div>
+                                        <div class="fe-block-label">Input</div>
+                                    </div>
+                                    <div class="fe-block" title="Textarea" draggable="true" (dragstart)="onMove($event, 'Textarea')">
+                                        <div class="fe-block__media">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 7.5c0-.9-.5-1.5-1.3-1.5H3.4C2.5 6 2 6.6 2 7.5v9c0 .9.5 1.5 1.3 1.5h17.4c.8 0 1.3-.6 1.3-1.5v-9zM21 17H3V7h18v10z"></path><path d="M4 8h1v4H4zM19 7h1v10h-1zM20 8h1v1h-1zM20 15h1v1h-1z"></path></svg>
+                                        </div>
+                                        <div class="fe-block-label">Textarea</div>
+                                    </div>
+                                    <div class="fe-block" title="Checkbox" draggable="true" (dragstart)="onMove($event, 'Checkbox')">
+                                        <div class="fe-block__media">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 17l-5-5 1.41-1.42L10 14.17l7.59-7.59L19 8m0-5H5c-1.11 0-2 .89-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5a2 2 0 0 0-2-2z"></path></svg>
+                                        </div>
+                                        <div class="fe-block-label">Checkbox</div>
+                                    </div>
+                                    <div class="fe-block" title="Radio" draggable="true" (dragstart)="onMove($event, 'Radio')">
+                                        <div class="fe-block__media">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8m0-18C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 5c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"></path></svg>
+                                        </div>
+                                        <div class="fe-block-label">Radio</div>
+                                    </div>
+                                    <div class="fe-block" title="Radio List" draggable="true" (dragstart)="onMove($event, 'RadioList')">
+                                        <div class="fe-block__media">
+                                           
+                                        </div>
+                                        <div class="fe-block-label">Radio List</div>
+                                    </div>
+                                    <div class="fe-block" title="Checkbox List" draggable="true" (dragstart)="onMove($event, 'CheckboxList')">
+                                        <div class="fe-block__media">
+                                          
+                                        </div>
+                                        <div class="fe-block-label">Checkbox List</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

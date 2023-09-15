@@ -1,5 +1,6 @@
 import { EventEmitter } from "@angular/core";
 
+import Mixins from "./mixins";
 
 export class FrameEvent {
     element: string = "";
@@ -7,11 +8,8 @@ export class FrameEvent {
     data: any;
 }
 
-export default class Frame {
+export default class Frame extends Mixins {
     public onChange: EventEmitter<FrameEvent> = new EventEmitter<FrameEvent>();
-
-    frame: any = null;
-    document: any = null;
 
     drag: any = {
         parent: null,
@@ -25,6 +23,7 @@ export default class Frame {
     hovered: any = null;
 
     constructor() {
+        super();
     }
 
     initFrame(el: HTMLIFrameElement) {
@@ -80,13 +79,15 @@ export default class Frame {
         if (this.hovered) {
             this.hovered.classList.remove("fe-hovered");
         }
-        this.hovered = event.target;
-        this.hovered.classList.add("fe-hovered");
+        if (event.target.getAttribute('data-fe-highlightable') === "true") {
+            this.hovered = event.target;
+            this.hovered.classList.add("fe-hovered");
 
-        data.type = this.hovered.getAttribute('data-fe-type');
-        if (data.type) {
-            data.clientRect = this.hovered.getBoundingClientRect();
-            data.display = "block";
+            data.type = this.hovered.getAttribute('data-fe-type');
+            if (data.type) {
+                data.clientRect = this.hovered.getBoundingClientRect();
+                data.display = "block";
+            }
         }
         this.onChange.emit({ element: "hoverframe", action: "update", data: data });
     }
@@ -97,6 +98,9 @@ export default class Frame {
             display: "none",
             type: null
         }
+        if (this.hovered) {
+            this.hovered.classList.remove("fe-hovered");
+        }
         this.hovered = null;
         this.onChange.emit({ element: "hoverframe", action: "update", data: data });
     }
@@ -105,16 +109,21 @@ export default class Frame {
         if (this.drag.parent) {
             this.drag.parent.classList.remove("fe-selected-parent");
         }
+        this.drag.target = null;
         if (event.target.getAttribute('draggable') === "true") {
             let drag = this._prepareDrag(event);
-            this.drag.parent = drag.parent;
-            this.drag.target = drag.target;
-            this.drag.append = drag.append;
-            this.drag.parent.classList.add("fe-selected-parent");
-            this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-            this.onChange.emit({ element: "placeholder", action: "update", data: drag.style });
+            if (drag) {
+                this.drag.parent = drag.parent;
+                this.drag.target = drag.target;
+                this.drag.append = drag.append;
+                this.drag.parent.classList.add("fe-selected-parent");
+                this.onChange.emit({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
+                this.onChange.emit({ element: "placeholder", action: "update", data: drag.style });
+            } else {
+                this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
+            }
         } else {
-            this.onChange.emit({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
+            this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
         }
         event.preventDefault();
     }
@@ -125,13 +134,13 @@ export default class Frame {
         }
         this.onChange.emit({ element: "placeholder", action: "update", data: { clientRect: null, display: "none" } });
         this.onChange.emit({ element: "hoverframe", action: "update", data: { clientRect: null, display: "none" } });
-        if (this.drag && this.drag.target.getAttribute('draggable') === "true") {
+        if (this.selected && this.drag.target && this.drag.target.getAttribute('draggable') === "true") {
             let data = event.dataTransfer.getData("text");
             if (data) {
-                let element = this.document.getElementById(data);
-                this.drag.target.appendChild(element);
-                element.classList.remove("fe-freezed");
-                element.click();
+                //let element = this.document.getElementById(data);
+                this.drag.target.appendChild(this.selected);
+                //element.classList.remove("fe-freezed");
+                //this.selected.click();
             }
         }
         this.drag.parent = null;
@@ -143,78 +152,107 @@ export default class Frame {
         let isInvalid = false;
         switch (sourceType) {
             case "Row":
-            case "Cell":
-                isInvalid = targetType == sourceType;
-                break;
-            case "Text":
                 isInvalid = targetType == "Row";
                 break;
+            case "Cell":
+                isInvalid = ["Cell", "Wrapper"].includes(targetType);
+                break;
+            case "Text1":
+                break;
             default:
+                isInvalid = ["Row", "Text", "Image", "Paragraph", "Table", "Input", "Textarea", "Checkbox", "Radio", "RadioList", "CheckboxList"].includes(targetType);
                 break;
         }
         return isInvalid;
     }
 
     private _prepareDrag(event: any) {
-        let data: any = {
-            parent: null,
-            style: {
-                clientRect: null,
-                display: "block",
-                class: "horizontal"
-            },
-            target: null,
-            append: null
-        };
-        let source = this.selected;
+        const source = this.selected;
         let sourceType = source.getAttribute('data-fe-type');
 
-        let target = event.target;
+        const target = event.target;
         let targetType = target.getAttribute('data-fe-type');
 
-        let isSameType = this._isValidPlace(sourceType, targetType);
-        if(isSameType) {
-            data.parent = target.parentElement;
-            data.target = target.parentElement;
+        const parent = event.target.parentElement;
+        let parentType = parent.getAttribute('data-fe-type');
+
+        if (parentType == "Body") {
+            return null;
+        }
+        //console.log("type", sourceType, targetType, parentType);
+        let data: any = { target: target, parent: parent, style: { clientRect: null, display: "block", class: "horizontal" } };
+        let current: any = null;
+        let currentType: any = null;
+        let isInvalid = this._isValidPlace(sourceType, targetType);
+
+        if (isInvalid) {
+            current = target.parentElement;
+            currentType = current.getAttribute('data-fe-type');
         } else {
-            data.parent = target;
-            data.target = target;
+            current = target;
+            currentType = target.getAttribute('data-fe-type');
         }
-        let hasChild = false;
-        let parentType = data.parent.getAttribute('data-fe-type');
-        if(parentType != "Wrapper") {
-            hasChild = data.target.children.length > 0;
-            if (hasChild) {
-                data.style.class = "vertical";
-            }
+
+        let hasChild = current.children.length > 0;
+        let clientRect = current.getBoundingClientRect();
+        let className = "horizontal";
+
+        if (currentType != "Wrapper" && hasChild) {
+            className = "vertical";
         }
-        
-        let clientRect = data.target.getBoundingClientRect();
-        if (hasChild) {
-            clientRect = target.getBoundingClientRect();
-            if (targetType == "Row") {
+
+        if (currentType != "Wrapper") {
+            if (className == "vertical") {
+                clientRect = target.getBoundingClientRect();
+                if (targetType == "Row") {
+                    data.style.clientRect = {
+                        top: clientRect.top + 5,
+                        left: clientRect.left + 10,
+                        width: "auto",
+                        height: clientRect.height - 10
+                    };
+                } else {
+                    data.style.clientRect = {
+                        top: clientRect.top - 5,
+                        left: clientRect.left,
+                        width: "auto",
+                        height: clientRect.height + 10
+                    };
+                }
+            } else {
                 data.style.clientRect = {
                     top: clientRect.top + 5,
-                    left: clientRect.left + 10,
-                    width: "auto",
-                    height: clientRect.height - 10
+                    left: clientRect.left + 5,
+                    width: clientRect.width - 10,
+                    height: 10
+                };
+            }
+        } else {
+            let lastElementChild = current.lastElementChild;
+            if (lastElementChild) {
+                clientRect = lastElementChild.getBoundingClientRect();
+                data.style.clientRect = {
+                    top: clientRect.bottom + 5,
+                    left: clientRect.left + 5,
+                    width: clientRect.width - 10,
+                    height: 10
                 };
             } else {
                 data.style.clientRect = {
-                    top: clientRect.top - 5,
-                    left: clientRect.left,
-                    width: "auto",
-                    height: clientRect.height + 10
+                    top: clientRect.top + 5,
+                    left: clientRect.left + 5,
+                    width: clientRect.width - 10,
+                    height: 10
                 };
             }
-        } else {
-            data.style.clientRect = {
-                top: clientRect.top + 5,
-                left: clientRect.left + 5,
-                width: clientRect.width - 10,
-                height: 10
-            };
         }
+        /*console.log("----------");
+        console.log("className", className);
+        console.log("currentType", currentType);
+        console.log("----------");*/
+        data.target = current;
+        data.style.class = className;
+
         return data;
     }
 
@@ -227,17 +265,30 @@ export default class Frame {
 
     CopySelected(event: any) {
         if (this.selected) {
+            let id = this.getNewId();
             let parent = this.selected.parentElement as HTMLElement;
             let node = this.selected.cloneNode(true);
+            node.id = id;
             parent.appendChild(node);
             node.click();
         }
     }
 
-    MoveSelected(event: any) {
-        if (this.selected) {
-            event.dataTransfer.setData("text", this.selected.id);
-            this.selected.classList.add("fe-freezed");
+    MoveSelected(event: any, block: string) {
+        let that: any = this;
+        if (block == "self") {
+            if (that.selected) {
+                that.selected.classList.remove("fe-selected");
+            }
+            event.dataTransfer.setData("text", that.selected.id);
+        } else {
+            if (that.selected) {
+                that.selected.classList.remove("fe-selected");
+            }
+            that.selected = that[that.blockType[block]]();
+
+            console.log(that.selected);
+            event.dataTransfer.setData("text", that.selected.id || that.selected.for);
         }
     }
 

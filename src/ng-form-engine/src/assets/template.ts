@@ -42,18 +42,18 @@ const template = `
             user-select: none;
             -webkit-user-select:none;
             -moz-user-select: none;
-          }
+        }
     
-          .fe-freezed {
+        .fe-freezed {
             opacity: 0.5;
             pointer-events: none;
-          }
+        }
     
-          .fe-no-pointer {
-            pointer-events: none;
-          }
-    
-          .fe-plh-image {
+        .fe-no-pointer {
+            ointer-events: none;
+        }
+
+        .fe-plh-image {
             background: #f5f5f5;
             border: none;
             height: 100px;
@@ -62,35 +62,71 @@ const template = `
             outline: 3px solid #ffca6f;
             cursor: pointer;
             outline-offset: -2px
-          }
-    
-          .fe-grabbing {
-            cursor: grabbing;
-            cursor: -webkit-grabbing;
-          }
-    
-          .fe-is__grabbing {
-            overflow-x: hidden;
-          }
-    
-          .fe-is__grabbing,
-          .fe-is__grabbing * {
-            cursor: grabbing !important;
-          }
-    
+        }
 
-        .fe-row {
+        [data-fe-type="Row"] {
             display: flex;
             justify-content: flex-start;
             align-items: stretch;
             flex-wrap: nowrap;
             padding: 10px;
         }
-
-        .fe-cell {
+        
+        [data-fe-type="Cell"] {
             min-height: 75px;
             flex-grow: 1;
             flex-basis: 100%;
+        }
+
+        [data-fe-type="Text"] {
+            padding: 10px;
+        }
+
+        [data-fe-type="Image"] {
+            background: #f5f5f5;
+            border: none;
+            height: 100px;
+            width: 100px;
+            display: block;
+            outline: 3px solid #ffca6f;
+            cursor: pointer;
+            outline-offset: -2px;
+        }
+
+        [data-fe-type="Checkbox"] {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+
+        [data-fe-type="Checkbox"] input[type=checkbox] {
+            flex: none;
+        }
+
+        [data-fe-type="Radio"] {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+
+        [data-fe-type="Radio"] input[type=radio] {
+            flex: none;
+            margin: 3px 3px 3px 4px;
+        }
+
+        [data-fe-type="Radio List"],
+        [data-fe-type="Checkbox List"] {
+            padding: 10px;
+        }
+
+        [data-fe-type="Table"] {
+            width: 100%;
+            padding: 10px;
+        }
+
+        [data-fe-type="Table"] table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         [data-fe-type="Wrapper"] {
@@ -114,9 +150,12 @@ const template = `
         <div id="iuv9" data-fe-highlightable="true" data-fe-type="Row" draggable="true" class="fe-row">
 
         </div>
+        <label for="c1"><input type="checkbox" name="color" value="red" id="c1">Red</label>
     </div>
 </body>
 </html>
 `;
+
+
 
 export default template;

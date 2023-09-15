@@ -12,12 +12,15 @@ import template from "../assets/template";
 })
 export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('refFrame') refFrame?: ElementRef<HTMLIFrameElement>;
+    @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<HTMLIFrameElement>;
     @ViewChild('refPlaceHolder') refPlaceHolder?: ElementRef<any>;
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
     _frame: any = null;
     _onChangeSubscription: any = null;
+    _toolBarAction: any = null;
+    _blockToolAction: any = null;
 
     getFrameEl() {
         return this.refFrame?.nativeElement as HTMLIFrameElement;
@@ -191,12 +194,17 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
         this._frame.CopySelected(event);
     }
 
-    onMove(event: any) {
-        this._frame.MoveSelected(event);
+    onMove(event: any, block: any) {
+        this._frame.MoveSelected(event, block);
     }
 
     onSelectParent(event: any) {
         this._frame.SelectParent(event);
+    }
+
+    onToolbarAction(action: any) {
+        this._toolBarAction = action;
+        this._blockToolAction = null;
     }
 
     ngOnDestroy() {
