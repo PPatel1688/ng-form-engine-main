@@ -1,6 +1,11 @@
+
+import cssToJSON from './cssToJSON';
+
 export default class Mixins {
     public frame: any = null;
     public document: any = null;
+    public cstStyle: any = null;
+    public cstStyleJson: any = {};
 
     public blockType: any = {
         OneColumn: "ctrOneColumn",
@@ -136,7 +141,7 @@ export default class Mixins {
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
-    
+
         source.append(table);
         return source;
     }
@@ -171,7 +176,7 @@ export default class Mixins {
         label.setAttribute("for", id);
         label.setAttribute("data-fe-type", "Checkbox");
 
-        if(self) {
+        if (self) {
             label.setAttribute("data-fe-highlightable", "true");
             label.setAttribute("draggable", "true");
         }
@@ -193,11 +198,11 @@ export default class Mixins {
         let text = this.document.createTextNode("value");
         label.setAttribute("for", id);
         label.setAttribute("data-fe-type", "Radio");
-        if(self) {
+        if (self) {
             label.setAttribute("data-fe-highlightable", "true");
             label.setAttribute("draggable", "true");
         }
-        
+
         let source = this.document.createElement("input");
         source.setAttribute("id", id);
         source.setAttribute("name", name || id);
@@ -281,4 +286,27 @@ export default class Mixins {
         return source;
     }
 
+    /********/
+
+    getCustomCSSString() {
+        return this.jsonToCSS(this.cstStyleJson);
+    }
+
+    jsonToCSS(data: any) {
+        const selectors = Object.keys(data);
+        return selectors.map((selector: any) => {
+            const definition = data[selector];
+            const rules = Object.keys(definition);
+            const result = rules.map((rule) => { return `${rule}:${definition[rule]}` }).join(';');
+            return `${selector}{${result}}`;
+        }).join('\n');
+    }
+
+    setCustomCSS(data: any = "") {
+        try {
+            this.cstStyleJson = cssToJSON(data);
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
 }

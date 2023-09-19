@@ -44,26 +44,46 @@ export default class FrameWrapper extends Mixins {
             let styleHTML = template.createElement("style");
             styleHTML.innerText = StyleHTML.replace(/(\r\n|\n|\r)/gm, "");
             this.document.head.appendChild(styleHTML);
-            
+
             let styleBuilder = template.createElement("style");
             styleBuilder.innerText = StyleBuilder.replace(/(\r\n|\n|\r)/gm, "");
-            styleBuilder.setAttribute("data-style", "system");
+            styleBuilder.setAttribute("id", "system");
             this.document.head.appendChild(styleBuilder);
+
+            let styleCustom = template.createElement("style");
+            styleCustom.innerText = "body{margin:0;background-color:#fff;} body{margin:0;}";
+            styleCustom.setAttribute("id", "custom");
+            this.document.head.appendChild(styleCustom);
+            this.cstStyle = styleCustom;
 
             let wrapper = this.ctrMainWrapper();
             this.document.body.appendChild(wrapper);
             
+            let id = this.getNewId();
+            this.document.body.setAttribute("id", id);
             this.document.body.setAttribute("data-fe-type", "Body");
             this.document.body.classList.add("fe-dashed");
         } else {
             let styleBuilder = template.createElement("style");
             styleBuilder.innerText = StyleBuilder.replace(/(\r\n|\n|\r)/gm, "");
+            styleBuilder.setAttribute("id", "system");
             this.document.head.appendChild(styleBuilder);
+
+            let styleCustom = template.getElementById("custom");
+            if(styleCustom == null) {
+                styleCustom = template.createElement("style");
+                styleCustom.innerText = "";
+                styleCustom.setAttribute("id", "custom");
+                this.document.head.appendChild(styleCustom);
+            }
+            this.cstStyle = styleCustom;
         }
+        this.setCustomCSS(this.cstStyle.innerText);
     }
 
     private _BindDocEvents() {
         if (this.document) {
+            this.document.addEventListener("dblclick", this._onDocDblClick.bind(this));
             this.document.addEventListener("click", this._onDocClick.bind(this));
             this.document.addEventListener("mouseover", this._onDocMouseOver.bind(this));
             this.document.addEventListener("mouseout", this._onDocMouseOut.bind(this));
@@ -74,6 +94,7 @@ export default class FrameWrapper extends Mixins {
 
     private _UnbindDocEvents() {
         if (this.document) {
+            this.document.removeEventListener("dblclick", this._onDocDblClick);
             this.document.removeEventListener("click", this._onDocClick);
             this.document.removeEventListener("mouseover", this._onDocMouseOver);
             this.document.removeEventListener("mouseout", this._onDocMouseOut);
@@ -82,10 +103,17 @@ export default class FrameWrapper extends Mixins {
         }
     }
 
+    private _onDocDblClick(event: any) {
+        if (event.target.getAttribute('data-fe-highlightable') === "true") {
+            this.onChange.next({ element: "selected", action: "update", data: null });
+        }
+    }
+
     private _onDocClick(event: any) {
         let data: any = {
             clientRect: null,
-            display: "none"
+            display: "none",
+            node: "",
         }
         if (this.selected) {
             this.selected.classList.remove("fe-selected");
@@ -96,7 +124,7 @@ export default class FrameWrapper extends Mixins {
 
             data.clientRect = this.selected.getBoundingClientRect();
             data.display = "block";
-            this.onChange.next({ element: "selected", action: "update", data: null });
+            data.node = this.selected.getAttribute('data-fe-type');
         }
         this.onChange.next({ element: "toolbar", action: "update", data: data });
     }

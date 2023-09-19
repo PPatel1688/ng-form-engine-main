@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 import FrameWrapper from "../common/frameWrapper";
+import { Observable } from "rxjs";
 
 @Component({
     selector: "ng-form-builder",
@@ -8,16 +9,20 @@ import FrameWrapper from "../common/frameWrapper";
     providers: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
+export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<any>;
     @ViewChild('refPlaceHolder') refPlaceHolder?: ElementRef<any>;
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
-    _frameWrapper: any = null;
     _onChangeSubscription: any = null;
-    _toolBarAction: any = "block";
-    _blockToolAction: any = "basic";
+
+    public toolBarAction: string = "block";
+    public subBlockToolBar: string = "basic";
+    public subStyleToolBar: string = "settings";
+    public context: any = null;
+
+    /****/
 
     get nePlaceHolder() {
         return this.refPlaceHolder?.nativeElement as HTMLElement;
@@ -31,16 +36,13 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.refToolBar?.nativeElement as HTMLElement;
     }
 
-    public get isStyleTool() {
-        return this._toolBarAction == "style";
-    }
-
-    public get isBlockTool() {
-        return this._toolBarAction == "block";
+    get isActiveStyleTool() {
+       return this.toolBarAction =='style';
     }
 
     constructor() {
-        this._frameWrapper = new FrameWrapper();
+        super();
+        this.context = this._GetNgModelContext();
     }
 
     ngOnInit() {
@@ -51,18 +53,58 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
         this._initializeEditor();
     }
 
+    _GetNgModelContext() {
+        let that = this;
+        let context = {
+            id: null,
+            control: null,
+            general: {
+                float: null,
+                display: null,
+                position: null,
+                top: null,
+                right: null,
+                left: null,
+                bottom: null,
+            },
+            dimension: {
+                width: null,
+                height: null,
+                maxWidth: null,
+                minHeight: null,
+                margin: { top: null, right: null, left: null, bottom: null, },
+                padding: { top: null, right: null, left: null, bottom: null, }
+            },
+            typography: {
+                font: null,
+                size: null,
+                weight: null,
+                color: null,
+                align: null,
+                decoration: null,
+            },
+            decorations: {
+                opacity: null,
+                borderRadius: { tl: null, tr: null, br: null, bl: null, },
+                border: { width: null, style: null, color: null, },
+                background: null
+            }
+        };
+        return context;
+    }
+
     _initializeEditor() {
         let that = this;
-        that._frameWrapper.initFrame(this.refFrameWrapper?.nativeElement);
-        that._onChangeSubscription = that._frameWrapper.onChange.subscribe((event: any) => { 
-            if(event) {
-                that._onEditorChange(event);
-            }
-        });
+        that.initFrame(this.refFrameWrapper?.nativeElement);
+        that._onChangeSubscription = that.onChange.subscribe(that._onEditorChange.bind(that));
+        that.toolBarAction = "block";
     }
 
     /**************************/
     _onEditorChange(event: any) {
+        if(event == null) {
+            return;
+        }
         switch (event.element) {
             case "toolbar":
                 this._setToolbarStyle(event.data);
@@ -74,7 +116,7 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
                 this._setPlaceHolderStyle(event.data);
                 break;
             case "selected":
-                //this.onToolbarAction('style');
+                this.onToolbarAction('style');
                 break;
             default:
                 break;
@@ -84,7 +126,7 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     _setToolbarStyle(data: any) {
         this.neToolBar.style.display = data.display;
         let element = data.clientRect;
-        if(element) {
+        if (element) {
             this.neToolBar.style.top = element.top + 'px';
             this.neToolBar.style.left = element.left + 'px';
             this.neToolBar.style.width = element.width + 'px';
@@ -101,7 +143,7 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     _setHoverFrameStyle(data: any) {
         this.neHoverFrame.style.display = data.display;
         let element = data.clientRect;
-        if(element) {
+        if (element) {
             this.neHoverFrame.style.top = element.top + 'px';
             this.neHoverFrame.style.left = element.left + 'px';
             this.neHoverFrame.style.width = element.width + 'px';
@@ -119,10 +161,10 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     _setPlaceHolderStyle(data: any) {
         this.nePlaceHolder.style.display = data.display;
         let element = data.clientRect;
-        if(element) {
+        if (element) {
             let placeholder = this.nePlaceHolder.getElementsByClassName("fe-placeholder")[0] as HTMLElement;
             placeholder.classList.add(data.class);
-            if(data.class == "vertical") {
+            if (data.class == "vertical") {
                 placeholder.classList.remove("horizontal");
                 placeholder.style.top = element.top + 'px';
                 placeholder.style.left = element.left + 'px';
@@ -140,31 +182,36 @@ export class FormBuilderComponent implements OnInit, AfterViewInit, OnDestroy {
     /**************************/
 
     onDelete(event: any) {
-        this._frameWrapper.DeleteSelected(event);
+        this.DeleteSelected(event);
     }
 
     onCopy(event: any) {
-        this._frameWrapper.CopySelected(event);
+        this.CopySelected(event);
     }
 
     onMove(event: any, block: any) {
-        this._frameWrapper.MoveSelected(event, block);
-    }
-
-    onSetting(event: any) {
-        this.onToolbarAction('style');
+        this.MoveSelected(event, block);
     }
 
     onSelectParent(event: any) {
-        this._frameWrapper.SelectParent(event);
+        this.SelectParent(event);
     }
 
     onToolbarAction(action: any) {
-        this._toolBarAction = action;
+        console.log("action", action);
+        this.toolBarAction = action;
+    }
+
+    hasValue(section: any, field: any) {
+        return this.context[section][field] != null;
+    }
+
+    onClearValue(section: any, field: any) {
+        this.context[section][field] = null;
     }
 
     ngOnDestroy() {
         this._onChangeSubscription.unsubscribe();
-        this._frameWrapper.destroy();
+        this.destroy();
     }
 }
