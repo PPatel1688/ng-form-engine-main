@@ -1,13 +1,12 @@
 import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 import FrameWrapper from "../common/frameWrapper";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 
 @Component({
     selector: "ng-form-builder",
     templateUrl: "./form-builder.component.html",
     styleUrls: ["./form-builder.component.scss"],
-    providers: [],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    providers: []
 })
 export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<any>;
@@ -36,17 +35,12 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         return this.refToolBar?.nativeElement as HTMLElement;
     }
 
-    get isActiveStyleTool() {
-       return this.toolBarAction =='style';
-    }
-
     constructor() {
         super();
         this.context = this._GetNgModelContext();
     }
 
     ngOnInit() {
-
     }
 
     ngAfterViewInit() {
@@ -62,7 +56,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 float: null,
                 display: null,
                 position: null,
-                top: null,
+                top: { value: null, unit: "" },
                 right: null,
                 left: null,
                 bottom: null,
@@ -99,10 +93,9 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         that._onChangeSubscription = that.onChange.subscribe(that._onEditorChange.bind(that));
         that.toolBarAction = "block";
     }
-
     /**************************/
     _onEditorChange(event: any) {
-        if(event == null) {
+        if (event == null) {
             return;
         }
         switch (event.element) {
@@ -198,16 +191,60 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     onToolbarAction(action: any) {
-        console.log("action", action);
         this.toolBarAction = action;
+        console.log("action", action);
     }
 
     hasValue(section: any, field: any) {
-        return this.context[section][field] != null;
+        if (['top'].includes(field)) {
+            return this.context[section][field]["value"] != null && this.context[section][field]["unit"] != null
+        } else {
+            return this.context[section][field] != null;
+        }
     }
 
     onClearValue(section: any, field: any) {
-        this.context[section][field] = null;
+        if (['top'].includes(field)) {
+            this.context[section][field]["value"] = null;
+            this.context[section][field]["unit"] = null;
+        } else {
+            this.context[section][field] = null;
+        }
+
+    }
+
+    onUnitChange(event: any, field: any, data: any) {
+        let unit = event.target.value;
+        if (data.value == null) {
+            event.target.value = "";
+        }
+        data.unit = unit;
+    }
+
+    onNumberKeyPress(txt: any, event: any) {
+        var charCode = (event.which) ? event.which : event.keyCode;
+        console.log("txt", txt);
+        if (charCode == 46) {
+            //Check if the text already contains the . character
+            if (txt.indexOf('.') === -1) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+        }
+        return true;
+    }
+
+    onNumberBlur(event: any, data: any, selector: any) {
+        if (data.value != null) {
+            let select = event.view.document.getElementById(selector);
+            if (select) {
+                select.value = data.unit = "px";
+            }
+        }
     }
 
     ngOnDestroy() {

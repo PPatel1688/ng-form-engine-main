@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="fe-pn-panel fe-pn-views-container fe-one-bg fe-two-color">
-                <div #refBlockTool [style.display]="toolBarAction =='block' ? 'block' : 'none'">
+                <div *ngIf="toolBarAction === 'block'">
                     <div class="fe-blocks-cs fe-one-bg fe-two-color">
                         <div class="fe-block-categories">
                             <div class="fe-block-category">
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                <div #refStyleTool *ngIf="isActiveStyleTool">
+                <div *ngIf="toolBarAction === 'style'">
                     <div class="fe-blocks-cs fe-one-bg fe-two-color">
                         <div class="fe-block-categories">
                             <div class="fe-block-category">
@@ -207,7 +207,7 @@
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'general'">
                                     General
                                 </div>
-                                <div class="fe-sm-properties">
+                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'general'">
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Float </span>
@@ -219,16 +219,16 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="none" name="float" value="none" [(ngModel)]="context.general.float">
-                                                        <label class="fe-radio-item-label" for="none"> N </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none" name="float" value="none" [(ngModel)]="context.general.float">
+                                                        <label class="fe-radio-item-label" for="float-none"> N </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="left" name="float" value="left" [(ngModel)]="context.general.float">
-                                                        <label class="fe-radio-item-label" for="left"> L </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-left" name="float" value="left" [(ngModel)]="context.general.float">
+                                                        <label class="fe-radio-item-label" for="float-left"> L </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="right" name="float" value="right" [(ngModel)]="context.general.float">
-                                                        <label class="fe-radio-item-label" for="right"> R </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-right" name="float" value="right" [(ngModel)]="context.general.float">
+                                                        <label class="fe-radio-item-label" for="float-right"> R </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,14 +237,14 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Display </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'display')" (click)="onClearValue('general', 'display')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
-                                                <span id="fe-sm-input-holder">
-                                                    <select>
+                                                <span class="fe-sm-input-holder">
+                                                    <select [(ngModel)]="context.general.display">
                                                         <option value="block">block</option>
                                                         <option value="inline">inline</option>
                                                         <option value="inline-block">inline-block</option>
@@ -261,14 +261,14 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Position </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'position')" (click)="onClearValue('general', 'position')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
-                                                <span id="fe-sm-input-holder">
-                                                    <select>
+                                                <span class="fe-sm-input-holder">
+                                                    <select [(ngModel)]="context.general.position">
                                                         <option value="static">static</option>
                                                         <option value="relative">relative</option>
                                                         <option value="absolute">absolute</option>
@@ -284,18 +284,18 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Top </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'top')" (click)="onClearValue('general', 'top')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
-                                                <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                <span class="fe-input-holder">
+                                                    <input id="txtGeneralTop" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)" (blur)="onNumberBlur($event, context.general.top, 'selGeneralTop')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select id="selGeneralTop" class="fe-input-unit" (change)="onUnitChange($event, 'top', context.general.top)">
+                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -314,7 +314,7 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Right </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'right')" (click)="onClearValue('general', 'right')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -344,7 +344,7 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Left </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'left')" (click)="onClearValue('general', 'left')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -374,7 +374,7 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Bottom </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('general', 'bottom')" (click)="onClearValue('general', 'bottom')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -403,7 +403,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!--<div class="fe-block-category">
+                            <div class="fe-block-category">
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'dimension'">
                                     Dimension
                                 </div>
@@ -943,7 +943,6 @@
                                     </div>
                                 </div>
                             </div>
-                            -->
                             <!--<div class="fe-block-category">
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'decorations'">
                                     Decorations
