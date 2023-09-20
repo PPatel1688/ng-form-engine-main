@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
 import FrameWrapper from "../common/frameWrapper";
-import { BehaviorSubject, Observable } from "rxjs";
+import { NgForm } from "@angular/forms";
 
 @Component({
     selector: "ng-form-builder",
@@ -14,13 +14,15 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
+    @ViewChild('ngContext') ngContext?: NgForm;
+
     _onChangeSubscription: any = null;
 
     public toolBarAction: string = "block";
     public subBlockToolBar: string = "basic";
     public subStyleToolBar: string = "settings";
-    public context: any = null;
 
+    public context: any = null;
     /****/
 
     get nePlaceHolder() {
@@ -41,14 +43,13 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     ngOnInit() {
+       
     }
 
     ngAfterViewInit() {
         this._initializeEditor();
     }
-
     _GetNgModelContext() {
-        let that = this;
         let context = {
             id: null,
             control: null,
@@ -57,21 +58,21 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 display: null,
                 position: null,
                 top: { value: null, unit: "" },
-                right: null,
-                left: null,
-                bottom: null,
+                right: { value: null, unit: "" },
+                left: { value: null, unit: "" },
+                bottom: { value: null, unit: "" },
             },
             dimension: {
-                width: null,
-                height: null,
-                maxWidth: null,
-                minHeight: null,
-                margin: { top: null, right: null, left: null, bottom: null, },
-                padding: { top: null, right: null, left: null, bottom: null, }
+                width: { value: null, unit: "" },
+                height: { value: null, unit: "" },
+                maxWidth: { value: null, unit: "" },
+                minHeight: { value: null, unit: "" },
+                margin: { top: { value: null, unit: "" }, right: { value: null, unit: "" }, left: { value: null, unit: "" }, bottom: { value: null, unit: "" }, },
+                padding: { top: { value: null, unit: "" }, right: { value: null, unit: "" }, left: { value: null, unit: "" }, bottom: { value: null, unit: "" }, }
             },
             typography: {
                 font: null,
-                size: null,
+                size: { value: null, unit: "" },
                 weight: null,
                 color: null,
                 align: null,
@@ -84,6 +85,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 background: null
             }
         };
+
         return context;
     }
 
@@ -196,36 +198,45 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     hasValue(section: any, field: any) {
-        if (['top'].includes(field)) {
-            return this.context[section][field]["value"] != null && this.context[section][field]["unit"] != null
+        if(this.context[section]) {
+            if (['top', 'right', 'left', 'bottom'].includes(field) && this.context[section][field]) {
+                if(this.context[section][field]) {
+                    return this.context[section][field]["value"] != null && this.context[section][field]["unit"] != null
+                } else {
+                    return false;
+                }
+            } else {
+                return this.context[section][field] != null;
+            }
         } else {
-            return this.context[section][field] != null;
+            return false;
         }
     }
 
     onClearValue(section: any, field: any) {
-        if (['top'].includes(field)) {
-            this.context[section][field]["value"] = null;
-            this.context[section][field]["unit"] = null;
-        } else {
-            this.context[section][field] = null;
+        if(this.context[section]) {
+            if (['top', 'right', 'left', 'bottom'].includes(field)) {
+                if (this.context[section][field]) {
+                    this.context[section][field]["value"] = null;
+                    this.context[section][field]["unit"] = null;
+                }
+            } else {
+                this.context[section][field] = null;
+            }
         }
-
     }
 
-    onUnitChange(event: any, field: any, data: any) {
+    /*onUnitChange(event: any, field: any, data: any) {
         let unit = event.target.value;
         if (data.value == null) {
             event.target.value = "";
         }
         data.unit = unit;
-    }
+    }*/
 
     onNumberKeyPress(txt: any, event: any) {
         var charCode = (event.which) ? event.which : event.keyCode;
-        console.log("txt", txt);
         if (charCode == 46) {
-            //Check if the text already contains the . character
             if (txt.indexOf('.') === -1) {
                 return true;
             } else {
@@ -238,13 +249,17 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         return true;
     }
 
-    onNumberBlur(event: any, data: any, selector: any) {
+    /*onNumberBlur(event: any, data: any, selector: any) {
         if (data.value != null) {
             let select = event.view.document.getElementById(selector);
             if (select) {
                 select.value = data.unit = "px";
             }
         }
+    }*/
+
+    onContextChange(form: NgForm) {
+        console.log(form.value); 
     }
 
     ngOnDestroy() {

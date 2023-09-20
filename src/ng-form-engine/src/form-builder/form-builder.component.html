@@ -170,8 +170,8 @@
                     </div>
                 </div>
                 <div *ngIf="toolBarAction === 'style'">
-                    <div class="fe-blocks-cs fe-one-bg fe-two-color">
-                        <div class="fe-block-categories">
+                    <form #ngContext="ngForm" novalidate [ngFormOptions]="{ updateOn: 'change' }" (change)="onContextChange(ngContext)">
+                        <div class="fe-blocks-cs fe-one-bg fe-two-color">
                             <div class="fe-block-category">
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'settings'">
                                     Settings
@@ -207,7 +207,7 @@
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'general'">
                                     General
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'general'">
+                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'general'" ngModelGroup="general">
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Float </span>
@@ -244,7 +244,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span class="fe-sm-input-holder">
-                                                    <select [(ngModel)]="context.general.display">
+                                                    <select name="display" [(ngModel)]="context.general.display">
                                                         <option value="block">block</option>
                                                         <option value="inline">inline</option>
                                                         <option value="inline-block">inline-block</option>
@@ -268,7 +268,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span class="fe-sm-input-holder">
-                                                    <select [(ngModel)]="context.general.position">
+                                                    <select name="position" [(ngModel)]="context.general.position">
                                                         <option value="static">static</option>
                                                         <option value="relative">relative</option>
                                                         <option value="absolute">absolute</option>
@@ -281,7 +281,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="top">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Top </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('general', 'top')" (click)="onClearValue('general', 'top')">
@@ -291,10 +291,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span class="fe-input-holder">
-                                                    <input id="txtGeneralTop" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)" (blur)="onNumberBlur($event, context.general.top, 'selGeneralTop')">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select id="selGeneralTop" class="fe-input-unit" (change)="onUnitChange($event, 'top', context.general.top)">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.top.unit">
                                                         <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
@@ -311,7 +311,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="right">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Right </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('general', 'right')" (click)="onClearValue('general', 'right')">
@@ -321,11 +321,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.right.value" (keypress)="onNumberKeyPress(context.general.right.value, $event)">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.right.unit">
+                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -341,7 +341,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="left">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Left </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('general', 'left')" (click)="onClearValue('general', 'left')">
@@ -351,11 +351,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.left.value" (keypress)="onNumberKeyPress(context.general.left.value, $event)">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.left.unit">
+                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -371,7 +371,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="bottom">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Bottom </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('general', 'bottom')" (click)="onClearValue('general', 'bottom')">
@@ -381,11 +381,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.bottom.value" (keypress)="onNumberKeyPress(context.general.bottom.value, $event)">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.bottom.unit">
+                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -943,16 +943,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <!--<div class="fe-block-category">
-                                <div class="fe-title" data-title="" (click)="subStyleToolBar = 'decorations'">
-                                    Decorations
-                                </div>
-                                <div class="fe-blocks-c" *ngIf="subStyleToolBar == 'decorations'">
-
-                                </div>
-                            </div>-->
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
