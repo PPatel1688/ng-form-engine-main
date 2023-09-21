@@ -43,7 +43,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     ngOnInit() {
-       
+
     }
 
     ngAfterViewInit() {
@@ -57,18 +57,18 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 float: null,
                 display: null,
                 position: null,
-                top: { value: null, unit: "" },
-                right: { value: null, unit: "" },
-                left: { value: null, unit: "" },
-                bottom: { value: null, unit: "" },
+                top: { value: null, unit: 'px' },
+                right: { value: null, unit: "px" },
+                left: { value: null, unit: "px" },
+                bottom: { value: null, unit: "px" },
             },
             dimension: {
-                width: { value: null, unit: "" },
-                height: { value: null, unit: "" },
-                maxWidth: { value: null, unit: "" },
-                minHeight: { value: null, unit: "" },
-                margin: { top: { value: null, unit: "" }, right: { value: null, unit: "" }, left: { value: null, unit: "" }, bottom: { value: null, unit: "" }, },
-                padding: { top: { value: null, unit: "" }, right: { value: null, unit: "" }, left: { value: null, unit: "" }, bottom: { value: null, unit: "" }, }
+                width: { value: null, unit: "px" },
+                height: { value: null, unit: "px" },
+                maxWidth: { value: null, unit: "px" },
+                minHeight: { value: null, unit: "px" },
+                margin: { top: { value: null, unit: "px" }, right: { value: null, unit: "px" }, left: { value: null, unit: "px" }, bottom: { value: null, unit: "px" }, },
+                padding: { top: { value: null, unit: "px" }, right: { value: null, unit: "px" }, left: { value: null, unit: "px" }, bottom: { value: null, unit: "px" }, }
             },
             typography: {
                 font: null,
@@ -198,28 +198,40 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     hasValue(section: any, field: any) {
-        if(this.context[section]) {
-            if (['top', 'right', 'left', 'bottom'].includes(field) && this.context[section][field]) {
-                if(this.context[section][field]) {
-                    return this.context[section][field]["value"] != null && this.context[section][field]["unit"] != null
+        if (this.context[section]) {
+            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight'].includes(field) && this.context[section][field]) {
+                if (this.context[section][field]) {
+                    return (this.context[section][field]["value"] || "").toString().length > 0 && this.context[section][field]["unit"] != null;
                 } else {
                     return false;
                 }
-            } else {
+            } else if (['margin', 'padding'].includes(field) && this.context[section][field]) {
+                let keys = Object.keys(this.context[section][field])
+                let hasValueKeys = keys.filter((x: any) => (this.context[section][field][x]["value"] || "").toString().length > 0 && this.context[section][field][x]["unit"] != null).length;
+                return hasValueKeys > 0;
+            }
+            else {
                 return this.context[section][field] != null;
             }
+
         } else {
             return false;
         }
     }
 
     onClearValue(section: any, field: any) {
-        if(this.context[section]) {
-            if (['top', 'right', 'left', 'bottom'].includes(field)) {
+        if (this.context[section]) {
+            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight'].includes(field)) {
                 if (this.context[section][field]) {
                     this.context[section][field]["value"] = null;
-                    this.context[section][field]["unit"] = null;
+                    this.context[section][field]["unit"] = "px";
                 }
+            } else if (['margin', 'padding'].includes(field)) {
+                let keys = Object.keys(this.context[section][field]);
+                keys.forEach((x: any) => {
+                    this.context[section][field][x]["value"] = null;
+                    this.context[section][field][x]["unit"] = "px";
+                });
             } else {
                 this.context[section][field] = null;
             }
@@ -243,27 +255,70 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 return false;
             }
         } else {
-            if (charCode > 31 && (charCode < 48 || charCode > 57))
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                 return false;
+            }
         }
         return true;
     }
 
-    /*onNumberBlur(event: any, data: any, selector: any) {
-        if (data.value != null) {
-            let select = event.view.document.getElementById(selector);
-            if (select) {
-                select.value = data.unit = "px";
+    onNumberBlur(section: any, field: any, subSection: any = null) {
+        if (this.context[section]) {
+            if (subSection == null && !this.context[section][field]["value"]) {
+                this.context[section][field]["unit"] = "px";
+            } else if (subSection != null && this.context[section][subSection] && !this.context[section][subSection][field]["value"]) {
+                this.context[section][subSection][field]["unit"] = "px";
             }
         }
-    }*/
+    }
+
+    onArrowUp(section: any, field: any, subSection: any = null, isNegative: any = false) {
+        let ctrSection = this.ngContext?.controls[section] as any;
+        let ctrField = ctrSection?.controls[field] as any;
+        if (subSection != null) {
+            if (["margin", "padding"].includes(field)) {
+                ctrField = ctrField.controls[subSection] as any
+            }
+        }
+        let ctrValue = ctrField?.controls["value"] as any;
+        if (ctrValue) {
+            ctrValue.setValue(this.getNumericValue(ctrValue.value) + 1);
+        }
+    }
+
+    onArrowDown(section: any, field: any, subSection: any = null, isNegative: any = false) {
+        let ctrSection = this.ngContext?.controls[section] as any;
+        let ctrField = ctrSection?.controls[field] as any;
+        if (["margin", "padding"].includes(field)) {
+            ctrField = ctrField.controls[subSection] as any
+        }
+
+        let ctrValue = ctrField?.controls["value"] as any;
+        if (ctrValue) {
+            if (!isNegative && ctrValue.value <= 0) {
+                ctrValue.setValue(0);
+            } else {
+                ctrValue.setValue(this.getNumericValue(ctrValue.value) - 1);
+            }
+        }
+    }
 
     onContextChange(form: NgForm) {
-        console.log(form.value); 
+        console.log(form.value);
+    }
+
+    getNumericValue(value: any) {
+        value = parseInt(value);
+        if (!isNaN(value))
+            return value;
+        else
+            return 0;
     }
 
     ngOnDestroy() {
         this._onChangeSubscription.unsubscribe();
         this.destroy();
     }
+
+
 }

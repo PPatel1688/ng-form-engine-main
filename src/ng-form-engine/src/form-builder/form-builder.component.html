@@ -291,11 +291,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span class="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)" (blur)="onNumberBlur('general', 'top')">
                                                 </span>
                                                 <span class="fe-field-units">
                                                     <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.top.unit">
-                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -305,8 +304,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'top')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'top')"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -321,11 +320,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.right.value" (keypress)="onNumberKeyPress(context.general.right.value, $event)">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.right.value" (keypress)="onNumberKeyPress(context.general.right.value, $event)" (blur)="onNumberBlur('general', 'right')">
                                                 </span>
                                                 <span class="fe-field-units">
                                                     <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.right.unit">
-                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -335,8 +333,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'right')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'right')"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -351,11 +349,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.left.value" (keypress)="onNumberKeyPress(context.general.left.value, $event)">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.left.value" (keypress)="onNumberKeyPress(context.general.left.value, $event)" (blur)="onNumberBlur('general', 'left')">
                                                 </span>
                                                 <span class="fe-field-units">
                                                     <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.left.unit">
-                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -365,8 +362,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'left')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'left')"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -381,11 +378,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.bottom.value" (keypress)="onNumberKeyPress(context.general.bottom.value, $event)">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.bottom.value" (keypress)="onNumberKeyPress(context.general.bottom.value, $event)" (blur)="onNumberBlur('general', 'bottom')">
                                                 </span>
                                                 <span class="fe-field-units">
                                                     <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.bottom.unit">
-                                                        <option value="">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -395,8 +391,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'bottom')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'bottom')"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -407,22 +403,21 @@
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'dimension'">
                                     Dimension
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'dimension'">
-                                    <div class="fe-sm-property">
+                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'dimension'" ngModelGroup="dimension">
+                                    <div class="fe-sm-property" ngModelGroup="width">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Width </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'width')" (click)="onClearValue('dimension', 'width')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.width.value" (keypress)="onNumberKeyPress(context.dimension.width.value, $event)" (blur)="onNumberBlur('dimension', 'width')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.width.unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -432,27 +427,26 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'width')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'width')"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="height">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Height </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'height')" (click)="onClearValue('dimension', 'height')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.height.value" (keypress)="onNumberKeyPress(context.dimension.height.value, $event)" (blur)="onNumberBlur('dimension', 'height')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.height.unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -462,27 +456,26 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'height')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'height')"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="maxWidth">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Max width </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'maxWidth')" (click)="onClearValue('dimension', 'maxWidth')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.maxWidth.value" (keypress)="onNumberKeyPress(context.dimension.maxWidth.value, $event)" (blur)="onNumberBlur('dimension', 'maxWidth')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.maxWidth.unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -492,27 +485,26 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'maxWidth')"></div>
+				                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'maxWidth')"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="minHeight">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Min height </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'minHeight')" (click)="onClearValue('dimension', 'minHeight')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.minHeight.value" (keypress)="onNumberKeyPress(context.dimension.minHeight.value, $event)" (blur)="onNumberBlur('dimension', 'minHeight')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.minHeight.unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -522,16 +514,16 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'minHeight')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'minHeight')"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full">
+                                    <div class="fe-sm-property fe-sm-property--full" ngModelGroup="margin">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Margin </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'margin')" (click)="onClearValue('dimension', 'margin')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -539,18 +531,17 @@
                                             <div class="fe-sm-field fe-sm-composite">
                                                 <span id="fe-sm-input-holder">
                                                     <div class="fe-sm-properties">
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="top">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Top </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.top.value" (keypress)="onNumberKeyPress(context.dimension.margin.top.value, $event)" (blur)="onNumberBlur('dimension', 'top', 'margin')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.top.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -560,24 +551,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'margin', 'top')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'margin', 'top', true)"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="right">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Right </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.right.value" (keypress)="onNumberKeyPress(context.dimension.margin.right.value, $event)" (blur)="onNumberBlur('dimension', 'right', 'margin')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.right.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -587,24 +577,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'margin', 'right')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'margin', 'right', true)"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="bottom">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Bottom </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.bottom.value" (keypress)="onNumberKeyPress(context.dimension.margin.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'bottom', 'margin')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select class="fe-input-unit" name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.bottom.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -614,24 +603,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'margin', 'bottom')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'margin', 'bottom', true)"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="left">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Left </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.left.value" (keypress)="onNumberKeyPress(context.dimension.margin.left.value, $event)" (blur)="onNumberBlur('dimension', 'left', 'margin')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.left.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -641,8 +629,8 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'margin', 'left')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'margin', 'left', true)"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -652,10 +640,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full">
+                                    <div class="fe-sm-property fe-sm-property--full" ngModelGroup="padding">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Padding </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('dimension', 'padding')" (click)="onClearValue('dimension', 'padding')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -663,18 +651,17 @@
                                             <div class="fe-sm-field fe-sm-composite">
                                                 <span id="fe-sm-input-holder">
                                                     <div class="fe-sm-properties">
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="top">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Top </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input  name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.top.value" (keypress)="onNumberKeyPress(context.dimension.padding.top.value, $event)" (blur)="onNumberBlur('dimension', 'top', 'padding')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.top.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -684,24 +671,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'padding', 'top')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'padding', 'top')"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="right">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Right </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.right.value" (keypress)="onNumberKeyPress(context.dimension.padding.right.value, $event)" (blur)="onNumberBlur('dimension', 'right', 'padding')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.right.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -711,24 +697,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'padding', 'right')"></div>
+				                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'padding', 'right')"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="bottom">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Bottom </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.bottom.value" (keypress)="onNumberKeyPress(context.dimension.padding.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'bottom', 'padding')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.bottom.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -738,24 +723,23 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'padding', 'bottom')"></div>
+                                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'padding', 'bottom')"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property">
+                                                        <div class="fe-sm-property" ngModelGroup="left">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Left </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input type="text" placeholder="auto">
+                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.left.value" (keypress)="onNumberKeyPress(context.dimension.padding.left.value, $event)" (blur)="onNumberBlur('dimension', 'left', 'padding')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit">
-                                                                            <option value="" selected>-</option>
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.left.unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -765,8 +749,8 @@
                                                                         </select>
                                                                     </span>
                                                                     <div class="fe-field-arrows">
-                                                                        <div class="fe-field-arrow-u"></div>
-                                                                        <div class="fe-field-arrow-d"></div>
+                                                                        <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'padding', 'left')"></div>
+                                                                        <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'padding', 'left')"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
