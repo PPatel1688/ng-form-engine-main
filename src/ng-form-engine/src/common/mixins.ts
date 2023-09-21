@@ -250,7 +250,7 @@ export default class Mixins {
     /********/
 
     getNewId() {
-        return (Math.random() + 1.1).toString(36).slice(-3);
+        return "fe" + (Math.random() + 1.1).toString(36).slice(-3);
     }
 
     createDomRow() {
@@ -299,7 +299,7 @@ export default class Mixins {
             const rules = Object.keys(definition);
             const result = rules.map((rule) => { return `${rule}:${definition[rule]}` }).join(';');
             return `${selector}{${result}}`;
-        }).join('\n');
+        }).join('');
     }
 
     setCustomCSS(data: any = "") {
@@ -308,5 +308,145 @@ export default class Mixins {
         } catch (error) {
             console.log("error", error);
         }
+    }
+
+    GetStyleContext() {
+        let context = {
+            id: null,
+            field: null,
+            control: null,
+            general: {
+                float: null,
+                display: null,
+                position: null,
+                top: { value: "", unit: "" },
+                right: { value: "", unit: "" },
+                left: { value: "", unit: "" },
+                bottom: { value: "", unit: "" },
+            },
+            dimension: {
+                width: { value: "", unit: "" },
+                height: { value: "", unit: "" },
+                maxWidth: { value: "", unit: "" },
+                minHeight: { value: "", unit: "" },
+                margin: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" }, },
+                padding: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" }, }
+            },
+            typography: {
+                font: null,
+                size: { value: "", unit: "" },
+                weight: null,
+                color: null,
+                align: null,
+                decoration: null,
+            },
+            decorations: {
+                opacity: null,
+                borderRadius: { tl: null, tr: null, br: null, bl: null, },
+                border: { width: null, style: null, color: null, },
+                background: null
+            }
+        };
+        return context;
+    }
+
+    _ContextToStyleObject(context: any) {
+        let Style: any = {};
+        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
+        let SubUnitFields: any = ["margin", "padding"];
+        let labels: any = {
+            maxWidth: "max-width",
+            minHeight: "min-height",
+            font: "font-family",
+            size: "font-size",
+            weight: "font-weight",
+            align: "text-align",
+            decoration: "text-decoration",
+            
+        };
+        //"dimension", "typography", "decorations"
+        for (let section of ["general", "dimension", "typography"]) {
+            let obj = context[section];
+            for (let key in obj) {
+                let label = labels[key] || key;
+                if (obj[key]) {
+                    if (UnitFields.includes(key)) {
+                        if (obj[key]["value"] && obj[key]["unit"]) {
+                            Style[label] = obj[key]["value"] + obj[key]["unit"];
+                        }
+                    } else if (SubUnitFields.includes(key)) {
+                        for (let subKey in obj[key]) {
+                            let subLabel = label;
+                            if (UnitFields.includes(subKey)) {
+                                subLabel = subLabel + "-" + subKey;
+                                if (obj[key][subKey]["value"] && obj[key][subKey]["unit"]) {
+                                    Style[subLabel] = obj[key][subKey]["value"] + obj[key][subKey]["unit"];
+                                }
+                            }
+                        }
+                    } else {
+                        Style[label] = obj[key];
+                    }
+                }
+            }
+        }
+        return Style;
+    }
+
+    _StyleObjectToContext(id: any, control: any, cssStyle: any) {
+        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
+        let SubUnitFields: any = ["margin", "padding"];
+        let labels: any = {
+            maxWidth: "max-width",
+            minHeight: "min-height",
+            font: "font-family",
+            size: "font-size",
+            weight: "font-weight",
+            align: "text-align",
+            decoration: "text-decoration"
+        };
+        let context: any = this.GetStyleContext();
+        context.id = "#" + id;
+        context.control = control;
+
+        for (let section of ["general", "dimension", "typography"]) {
+            let obj = context[section];
+            for (let key in obj) {
+                let label = labels[key] || key;
+                let value = cssStyle.getPropertyValue(label);
+                if(section == "typography") {
+                    if(key == "font") {
+                        value = value.replace('"', "").replace('"', "");
+                    }
+                    console.log("value", label, value);
+                }
+               
+
+                if (UnitFields.includes(key)) {
+                    let num = value == "auto" ? "" : value.replace(/[^0-9\.]+/g, "");
+                    let unit = value == "auto" ? "" : value.replace(num, "");
+                    obj[key]["value"] = num;
+                    obj[key]["unit"] = unit;
+                } else if (SubUnitFields.includes(key)) {
+                    for (let subKey in obj[key]) {
+                        let subLabel = label;
+                        if (UnitFields.includes(subKey)) {
+                            subLabel = subLabel + "-" + subKey;
+                            value = cssStyle.getPropertyValue(subLabel);
+                            let num = value == "0px" ? "" : value.replace(/[^0-9\.]+/g, "");
+                            let unit = value == "0px" ? "" : value.replace(num, "");
+                            obj[key][subKey]["value"] = num;
+                            obj[key][subKey]["unit"] = unit;
+                        }
+                    }
+                } else {
+                    obj[key] = value;
+                }
+            }
+        }
+
+        console.log("context", context);
+
+        return context;
     }
 }

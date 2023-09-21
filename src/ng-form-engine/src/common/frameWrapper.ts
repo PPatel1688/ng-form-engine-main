@@ -40,7 +40,7 @@ export default class FrameWrapper extends Mixins {
         let isDefault = source ? false : true;
         let template = new DOMParser().parseFromString(source || HTMLTemplate, 'text/html');;
 
-        if(isDefault) {
+        if (isDefault) {
             let styleHTML = template.createElement("style");
             styleHTML.innerText = StyleHTML.replace(/(\r\n|\n|\r)/gm, "");
             this.document.head.appendChild(styleHTML);
@@ -58,7 +58,7 @@ export default class FrameWrapper extends Mixins {
 
             let wrapper = this.ctrMainWrapper();
             this.document.body.appendChild(wrapper);
-            
+
             let id = this.getNewId();
             this.document.body.setAttribute("id", id);
             this.document.body.setAttribute("data-fe-type", "Body");
@@ -70,7 +70,7 @@ export default class FrameWrapper extends Mixins {
             this.document.head.appendChild(styleBuilder);
 
             let styleCustom = template.getElementById("custom");
-            if(styleCustom == null) {
+            if (styleCustom == null) {
                 styleCustom = template.createElement("style");
                 styleCustom.innerText = "";
                 styleCustom.setAttribute("id", "custom");
@@ -240,7 +240,7 @@ export default class FrameWrapper extends Mixins {
         if (parentType == "Body") {
             //return null;
         }
-        
+
         let data: any = { target: target, parent: parent, style: { clientRect: null, display: "block", class: "horizontal" } };
         let current: any = null;
         let currentType: any = null;
@@ -356,6 +356,27 @@ export default class FrameWrapper extends Mixins {
             this.selected.remove();
             this.selected = null;
         }
+    }
+
+    SetStyleContext() {
+        if (this.selected == null) {
+            return null;
+        }
+        let id = this.selected.getAttribute('id');
+        let control = this.selected.getAttribute('data-fe-type');
+        if (control != "Wrapper") {
+            return this._StyleObjectToContext(id, control, this.document.defaultView.getComputedStyle(this.selected, null));
+        } else {
+            return null;
+        }
+    }
+
+    UpdateStyleContext(context: any) {
+        this.cstStyleJson[context.id] = this._ContextToStyleObject(context);
+
+        console.log("this.cstStyleJson[context.id]", this.cstStyleJson[context.id]);
+        this.cstStyle.innerText = this.jsonToCSS(this.cstStyleJson);
+        console.log("this.cstStyleJson", this.cstStyle.innerText);
     }
 
     destroy() {

@@ -39,7 +39,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     constructor() {
         super();
-        this.context = this._GetNgModelContext();
+        //this.context = this._GetNgModelContext();
     }
 
     ngOnInit() {
@@ -49,6 +49,8 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     ngAfterViewInit() {
         this._initializeEditor();
     }
+
+    /*
     _GetNgModelContext() {
         let context = {
             id: null,
@@ -87,7 +89,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         };
 
         return context;
-    }
+    }*/
 
     _initializeEditor() {
         let that = this;
@@ -132,6 +134,8 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
             toolbar.style.top = element.height + 'px';
             toolbar.style.left = (element.width - bToolbar.width) + '0px';
+
+            this.context = this.SetStyleContext();
         }
     }
 
@@ -199,9 +203,9 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     hasValue(section: any, field: any) {
         if (this.context[section]) {
-            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight'].includes(field) && this.context[section][field]) {
+            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'size'].includes(field) && this.context[section][field]) {
                 if (this.context[section][field]) {
-                    return (this.context[section][field]["value"] || "").toString().length > 0 && this.context[section][field]["unit"] != null;
+                    return (this.context[section][field]["value"] || "").toString().length > 0 && this.context[section][field]["unit"] != "";
                 } else {
                     return false;
                 }
@@ -221,30 +225,22 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     onClearValue(section: any, field: any) {
         if (this.context[section]) {
-            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight'].includes(field)) {
+            if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'size'].includes(field)) {
                 if (this.context[section][field]) {
-                    this.context[section][field]["value"] = null;
-                    this.context[section][field]["unit"] = "px";
+                    this.context[section][field]["value"] = "";
+                    this.context[section][field]["unit"] = "";
                 }
             } else if (['margin', 'padding'].includes(field)) {
                 let keys = Object.keys(this.context[section][field]);
                 keys.forEach((x: any) => {
-                    this.context[section][field][x]["value"] = null;
-                    this.context[section][field][x]["unit"] = "px";
+                    this.context[section][field][x]["value"] = "";
+                    this.context[section][field][x]["unit"] = "";
                 });
             } else {
                 this.context[section][field] = null;
             }
         }
     }
-
-    /*onUnitChange(event: any, field: any, data: any) {
-        let unit = event.target.value;
-        if (data.value == null) {
-            event.target.value = "";
-        }
-        data.unit = unit;
-    }*/
 
     onNumberKeyPress(txt: any, event: any) {
         var charCode = (event.which) ? event.which : event.keyCode;
@@ -263,11 +259,18 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     onNumberBlur(section: any, field: any, subSection: any = null) {
-        if (this.context[section]) {
-            if (subSection == null && !this.context[section][field]["value"]) {
-                this.context[section][field]["unit"] = "px";
-            } else if (subSection != null && this.context[section][subSection] && !this.context[section][subSection][field]["value"]) {
-                this.context[section][subSection][field]["unit"] = "px";
+        let ctrSection = this.ngContext?.controls[section] as any;
+        let ctrField = ctrSection?.controls[field] as any;
+        if (["margin", "padding"].includes(field) && subSection != null) {
+            ctrField = ctrField.controls[subSection] as any;
+        }
+        let ctrValue = ctrField?.controls["value"] as any;
+        let ctrUnit = ctrField?.controls["unit"] as any;
+        if (ctrValue) {
+            if ((ctrValue.value || "").length > 0) {
+                ctrUnit.setValue("px");
+            } else {
+                ctrUnit.setValue("");
             }
         }
     }
@@ -281,8 +284,13 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
             }
         }
         let ctrValue = ctrField?.controls["value"] as any;
-        if (ctrValue) {
-            ctrValue.setValue(this.getNumericValue(ctrValue.value) + 1);
+        let ctrUnit = ctrField?.controls["unit"] as any;
+        let value = this.getNumericValue(ctrValue.value || "0") + 1;
+        if (value != null) {
+            ctrValue.setValue(value.toString());
+            if (ctrUnit.value == "") {
+                ctrUnit.setValue("px");
+            }
         }
     }
 
@@ -294,17 +302,35 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         }
 
         let ctrValue = ctrField?.controls["value"] as any;
-        if (ctrValue) {
-            if (!isNegative && ctrValue.value <= 0) {
-                ctrValue.setValue(0);
-            } else {
-                ctrValue.setValue(this.getNumericValue(ctrValue.value) - 1);
+        let ctrUnit = ctrField?.controls["unit"] as any;
+        let value = this.getNumericValue(ctrValue.value || "0") - 1;
+
+        console.log("down", value);
+
+        if (isNegative) {
+            ctrValue.setValue(value.toString());
+            if (ctrUnit.value == "") {
+                ctrUnit.setValue("px");
             }
+        } else {
+            if(value > 0) {
+                ctrValue.setValue(value.toString());
+                if (ctrUnit.value == "") {
+                    ctrUnit.setValue("px");
+                }
+            } else {
+                ctrValue.setValue("");
+                if (ctrUnit.value != "") {
+                    ctrUnit.setValue("");
+                }
+            }
+            
         }
     }
 
     onContextChange(form: NgForm) {
         console.log(form.value);
+        this.UpdateStyleContext(this.context);
     }
 
     getNumericValue(value: any) {

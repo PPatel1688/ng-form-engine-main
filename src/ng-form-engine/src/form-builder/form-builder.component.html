@@ -53,13 +53,13 @@
             </div>
             <div class="fe-pn-panel fe-pn-views fe-pn-height fe-one-bg fe-two-color">
                 <div class="fe-pn-buttons">
-                    <span title="Open Style Manager" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{ 'fe-active' : toolBarAction =='block' }" (click)="onToolbarAction('style')">
+                    <span title="Open Style Manager" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{ 'fe-pn-active' : toolBarAction =='style' }" (click)="onToolbarAction('style')">
                         <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"></path></svg>
                     </span>
                     <!--<span title="Open Layer Manager" data-tooltip-pos="bottom" class="fe-pn-btn">
                         <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z"></path></svg>
                     </span>-->
-                    <span title="Open Blocks" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{ 'fe-active' : toolBarAction =='style' }" (click)="onToolbarAction('block')">
+                    <span title="Open Blocks" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{ 'fe-pn-active' : toolBarAction =='block' }" (click)="onToolbarAction('block')">
                         <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H13V17H11V13H7V11H11V7H13V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"></path></svg>
                     </span>
                 </div>
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="toolBarAction === 'style'">
+                <div *ngIf="toolBarAction === 'style' && context">
                     <form #ngContext="ngForm" novalidate [ngFormOptions]="{ updateOn: 'change' }" (change)="onContextChange(ngContext)">
                         <div class="fe-blocks-cs fe-one-bg fe-two-color">
                             <div class="fe-block-category">
@@ -184,19 +184,31 @@
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" placeholder="eg. Text here">
+                                                    <input type="text" readonly name="id" [(ngModel)]="context.id">
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
+                                            <span class="fe-sm-icon" title=""> Node Type </span>
+                                        </div>
+                                        <div class="fe-fields">
+                                            <div class="fe-field">
+                                                <span id="fe-sm-input-holder">
+                                                    <input type="text" readonly name="control" [(ngModel)]="context.control">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="fe-sm-property fe-sm-property--full" *ngIf="['Input'].includes(context.control)">
+                                        <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Mapping field </span>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" placeholder="eg. Text here">
+                                                    <input type="text" placeholder="eg. Text here" name="field" [(ngModel)]="context.field">
                                                 </span>
                                             </div>
                                         </div>
@@ -291,10 +303,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span class="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)" (blur)="onNumberBlur('general', 'top')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.general.top.value" (keypress)="onNumberKeyPress(context.general.top.value, $event)" (blur)="onNumberBlur('general', 'top')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.top.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.top.unit" [disabled]="context.general.top.value == ''">
+                                                        <option value="" [hidden]="context.general.top.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -304,8 +317,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'top')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'top')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'top', null, true)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'top', null, true)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -320,10 +333,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.right.value" (keypress)="onNumberKeyPress(context.general.right.value, $event)" (blur)="onNumberBlur('general', 'right')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.general.right.value" (keypress)="onNumberKeyPress(context.general.right.value, $event)" (blur)="onNumberBlur('general', 'right')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.right.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.right.unit" [disabled]="context.general.right.value == ''">
+                                                        <option value="" [hidden]="context.general.right.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -333,8 +347,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'right')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'right')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'right', null, true)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'right', null, true)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -349,10 +363,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.left.value" (keypress)="onNumberKeyPress(context.general.left.value, $event)" (blur)="onNumberBlur('general', 'left')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.general.left.value" (keypress)="onNumberKeyPress(context.general.left.value, $event)" (blur)="onNumberBlur('general', 'left')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.left.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.left.unit" [disabled]="context.general.left.value == ''">
+                                                        <option value="" [hidden]="context.general.left.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -362,8 +377,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'left')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'left')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'left', null, true)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'left', null, true)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -378,10 +393,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.general.bottom.value" (keypress)="onNumberKeyPress(context.general.bottom.value, $event)" (blur)="onNumberBlur('general', 'bottom')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.general.bottom.value" (keypress)="onNumberKeyPress(context.general.bottom.value, $event)" (blur)="onNumberBlur('general', 'bottom')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.bottom.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.general.bottom.unit" [disabled]="context.general.bottom.value == ''">
+                                                        <option value="" [hidden]="context.general.bottom.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -391,8 +407,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'bottom')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'bottom')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('general', 'bottom', null, true)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('general', 'bottom', null, true)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -414,10 +430,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.width.value" (keypress)="onNumberKeyPress(context.dimension.width.value, $event)" (blur)="onNumberBlur('dimension', 'width')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.width.value" (keypress)="onNumberKeyPress(context.dimension.width.value, $event)" (blur)="onNumberBlur('dimension', 'width')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.width.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.width.unit" [disabled]="context.dimension.width.value == ''">
+                                                        <option value="" [hidden]="context.dimension.width.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -427,8 +444,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'width')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'width')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'width', null, true)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'width', null, true)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -443,10 +460,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.height.value" (keypress)="onNumberKeyPress(context.dimension.height.value, $event)" (blur)="onNumberBlur('dimension', 'height')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.height.value" (keypress)="onNumberKeyPress(context.dimension.height.value, $event)" (blur)="onNumberBlur('dimension', 'height')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.height.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.height.unit" [disabled]="context.dimension.height.value == ''">
+                                                        <option value="" [hidden]="context.dimension.height.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -456,8 +474,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'height')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'height')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'height', null)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'height', null)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -472,10 +490,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.maxWidth.value" (keypress)="onNumberKeyPress(context.dimension.maxWidth.value, $event)" (blur)="onNumberBlur('dimension', 'maxWidth')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.maxWidth.value" (keypress)="onNumberKeyPress(context.dimension.maxWidth.value, $event)" (blur)="onNumberBlur('dimension', 'maxWidth')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.maxWidth.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.maxWidth.unit" [disabled]="context.dimension.maxWidth.value == ''">
+                                                        <option value="" [hidden]="context.dimension.maxWidth.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -485,8 +504,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'maxWidth')"></div>
-				                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'maxWidth')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'maxWidth', null)"></div>
+				                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'maxWidth', null)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -501,10 +520,11 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.minHeight.value" (keypress)="onNumberKeyPress(context.dimension.minHeight.value, $event)" (blur)="onNumberBlur('dimension', 'minHeight')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.minHeight.value" (keypress)="onNumberKeyPress(context.dimension.minHeight.value, $event)" (blur)="onNumberBlur('dimension', 'minHeight')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.minHeight.unit">
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.minHeight.unit" [disabled]="context.dimension.minHeight.value == ''">
+                                                        <option value="" [hidden]="context.dimension.minHeight.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -514,8 +534,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'minHeight')"></div>
-                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'minHeight')"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('dimension', 'minHeight', null)"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('dimension', 'minHeight', null)"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -538,10 +558,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.top.value" (keypress)="onNumberKeyPress(context.dimension.margin.top.value, $event)" (blur)="onNumberBlur('dimension', 'top', 'margin')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.margin.top.value" (keypress)="onNumberKeyPress(context.dimension.margin.top.value, $event)" (blur)="onNumberBlur('dimension', 'margin', 'top')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.top.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.top.unit" [disabled]="context.dimension.margin.top.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.margin.top.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -564,10 +585,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.right.value" (keypress)="onNumberKeyPress(context.dimension.margin.right.value, $event)" (blur)="onNumberBlur('dimension', 'right', 'margin')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.margin.right.value" (keypress)="onNumberKeyPress(context.dimension.margin.right.value, $event)" (blur)="onNumberBlur('dimension', 'margin', 'right')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.right.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.right.unit" [disabled]="context.dimension.margin.right.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.margin.right.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -590,10 +612,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.bottom.value" (keypress)="onNumberKeyPress(context.dimension.margin.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'bottom', 'margin')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.margin.bottom.value" (keypress)="onNumberKeyPress(context.dimension.margin.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'margin', 'bottom')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select class="fe-input-unit" name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.bottom.unit">
+                                                                        <select class="fe-input-unit" name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.bottom.unit" [disabled]="context.dimension.margin.bottom.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.margin.bottom.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -616,10 +639,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.margin.left.value" (keypress)="onNumberKeyPress(context.dimension.margin.left.value, $event)" (blur)="onNumberBlur('dimension', 'left', 'margin')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.margin.left.value" (keypress)="onNumberKeyPress(context.dimension.margin.left.value, $event)" (blur)="onNumberBlur('dimension', 'margin', 'left')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.left.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.margin.left.unit" [disabled]="context.dimension.margin.left.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.margin.left.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -658,10 +682,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input  name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.top.value" (keypress)="onNumberKeyPress(context.dimension.padding.top.value, $event)" (blur)="onNumberBlur('dimension', 'top', 'padding')">
+                                                                        <input  name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.padding.top.value" (keypress)="onNumberKeyPress(context.dimension.padding.top.value, $event)" (blur)="onNumberBlur('dimension', 'padding', 'top')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.top.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.top.unit" [disabled]="context.dimension.padding.top.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.padding.top.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -684,10 +709,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.right.value" (keypress)="onNumberKeyPress(context.dimension.padding.right.value, $event)" (blur)="onNumberBlur('dimension', 'right', 'padding')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.padding.right.value" (keypress)="onNumberKeyPress(context.dimension.padding.right.value, $event)" (blur)="onNumberBlur('dimension', 'padding', 'right')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.right.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.right.unit" [disabled]="context.dimension.padding.right.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.padding.right.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -710,10 +736,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.bottom.value" (keypress)="onNumberKeyPress(context.dimension.padding.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'bottom', 'padding')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.padding.bottom.value" (keypress)="onNumberKeyPress(context.dimension.padding.bottom.value, $event)" (blur)="onNumberBlur('dimension', 'padding', 'bottom')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.bottom.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.bottom.unit" [disabled]="context.dimension.padding.bottom.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.padding.bottom.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -736,10 +763,11 @@
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" [(ngModel)]="context.dimension.padding.left.value" (keypress)="onNumberKeyPress(context.dimension.padding.left.value, $event)" (blur)="onNumberBlur('dimension', 'left', 'padding')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.dimension.padding.left.value" (keypress)="onNumberKeyPress(context.dimension.padding.left.value, $event)" (blur)="onNumberBlur('dimension', 'padding', 'left')">
                                                                     </span>
                                                                     <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.left.unit">
+                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.dimension.padding.left.unit" [disabled]="context.dimension.padding.left.value == ''">
+                                                                            <option value="" [hidden]="context.dimension.padding.left.value != ''">-</option>
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -766,18 +794,18 @@
                                 <div class="fe-title" data-title="" (click)="subStyleToolBar = 'typography'">
                                     Typography
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'typography'">
+                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'typography'" ngModelGroup="typography">
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Font family </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'font')" (click)="onClearValue('typography', 'font')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span id="fe-sm-input-holder">
-                                                    <select>
+                                                    <select name="font" [(ngModel)]="context.typography.font">
                                                         <option value="Arial, Helvetica, sans-serif">Arial</option>
                                                         <option value="Arial Black, Gadget, sans-serif">Arial Black</option>
                                                         <option value="Brush Script MT, sans-serif">Brush Script MT</option>
@@ -798,21 +826,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property">
+                                    <div class="fe-sm-property" ngModelGroup="size">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Font size </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'size')" (click)="onClearValue('typography', 'size')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input type="text" placeholder="auto">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.typography.size.value" (keypress)="onNumberKeyPress(context.typography.size.value, $event)" (blur)="onNumberBlur('typography', 'size')">
                                                 </span>
                                                 <span class="fe-field-units">
-                                                    <select class="fe-input-unit">
-                                                        <option value="" selected>-</option>
+                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.typography.size.unit" [disabled]="context.typography.size.value == ''">
+                                                        <option value="" [hidden]="context.typography.size.value != ''">-</option>
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -822,8 +850,8 @@
                                                     </select>
                                                 </span>
                                                 <div class="fe-field-arrows">
-                                                    <div class="fe-field-arrow-u"></div>
-                                                    <div class="fe-field-arrow-d"></div>
+                                                    <div class="fe-field-arrow-u" (click)="onArrowUp('typography', 'size')"></div>
+                                                    <div class="fe-field-arrow-d" (click)="onArrowDown('typography', 'size')"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -831,14 +859,14 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Font weight </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'weight')" (click)="onClearValue('typography', 'weight')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span id="fe-sm-input-holder">
-                                                    <select>
+                                                    <select name="weight" [(ngModel)]="context.typography.weight">
                                                         <option value="100">Thin</option>
                                                         <option value="200">Extra-Light</option>
                                                         <option value="300">Light</option>
@@ -859,20 +887,20 @@
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Color </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'color')" (click)="onClearValue('typography', 'color')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-input-holder">
-                                                <input type="color" placeholder="black">
+                                                <input name="color" type="color" placeholder="black" autocomplete="off" [(ngModel)]="context.typography.color">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Text align </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'align')" (click)="onClearValue('typography', 'align')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -880,20 +908,20 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2689" name="float-c2689" value="none">
-                                                        <label class="fe-radio-item-label" for="float-none-c2689"> N </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-left" name="align" value="left" [(ngModel)]="context.typography.align">
+                                                        <label class="fe-radio-item-label" for="align-left"> L </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2688" name="float-c2689" value="left">
-                                                        <label class="fe-radio-item-label" for="float-none-c2688"> L </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-center" name="align" value="center" [(ngModel)]="context.typography.align">
+                                                        <label class="fe-radio-item-label" for="align-center"> C </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2687" name="float-c2689" value="right">
-                                                        <label class="fe-radio-item-label" for="float-none-c2687"> R </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-right" name="align" value="right" [(ngModel)]="context.typography.align">
+                                                        <label class="fe-radio-item-label" for="align-right"> R </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2687" name="float-c2689" value="right">
-                                                        <label class="fe-radio-item-label" for="float-none-c2687"> R </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-justify" name="align" value="justify" [(ngModel)]="context.typography.align">
+                                                        <label class="fe-radio-item-label" for="align-justify"> J </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -902,7 +930,7 @@
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Text decoration </span>
-                                            <div class="fe-sm-clear">
+                                            <div class="fe-sm-clear" *ngIf="hasValue('typography', 'decoration')" (click)="onClearValue('typography', 'decoration')">
                                                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                                             </div>
                                         </div>
@@ -910,16 +938,16 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2689" name="float-c2689" value="none">
-                                                        <label class="fe-radio-item-label" for="float-none-c2689"> N </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-none" name="decoration" value="none" [(ngModel)]="context.typography.decoration">
+                                                        <label class="fe-radio-item-label" for="decoration-none"> N </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2688" name="float-c2689" value="left">
-                                                        <label class="fe-radio-item-label" for="float-none-c2688"> L </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-underline" name="decoration" value="underline" [(ngModel)]="context.typography.decoration">
+                                                        <label class="fe-radio-item-label" for="decoration-underline"> U </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none-c2687" name="float-c2689" value="right">
-                                                        <label class="fe-radio-item-label" for="float-none-c2687"> R </label>
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-line-through" name="decoration" value="line-through" [(ngModel)]="context.typography.decoration">
+                                                        <label class="fe-radio-item-label" for="decoration-line-through"> LT </label>
                                                     </div>
                                                 </div>
                                             </div>
