@@ -25,6 +25,8 @@ export default class FrameWrapper extends Mixins {
     selected: any = null;
     hovered: any = null;
 
+    
+
     constructor() {
         super();
     }
@@ -364,8 +366,10 @@ export default class FrameWrapper extends Mixins {
         }
         let id = this.selected.getAttribute('id');
         let control = this.selected.getAttribute('data-fe-type');
+        let cssStyle = this.document.defaultView.getComputedStyle(this.selected, null);
         if (control != "Wrapper") {
-            return this._StyleObjectToContext(id, control, this.document.defaultView.getComputedStyle(this.selected, null));
+            //this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
+            return this._StyleObjectToContext(id, control, cssStyle);
         } else {
             return null;
         }
@@ -376,7 +380,7 @@ export default class FrameWrapper extends Mixins {
 
         console.log("this.cstStyleJson[context.id]", this.cstStyleJson[context.id]);
         this.cstStyle.innerText = this.jsonToCSS(this.cstStyleJson);
-        console.log("this.cstStyleJson", this.cstStyle.innerText);
+        //console.log("this.cstStyleJson", this.cstStyle.innerText);
     }
 
     destroy() {

@@ -24,6 +24,10 @@ export default class Mixins {
         CheckboxList: "ctrCheckboxList"
     }
 
+    constructor() {
+    }
+
+
     public ctrMainWrapper() {
         let id = this.getNewId();
         let source = this.document.createElement("div");
@@ -339,14 +343,15 @@ export default class Mixins {
                 color: null,
                 align: null,
                 decoration: null,
-            },
-            decorations: {
-                opacity: null,
-                borderRadius: { tl: null, tr: null, br: null, bl: null, },
-                border: { width: null, style: null, color: null, },
-                background: null
             }
         };
+
+        /*decorations: {
+            opacity: null,
+            borderRadius: { tl: null, tr: null, br: null, bl: null, },
+            border: { width: null, style: null, color: null, },
+            background: null
+        }*/
         return context;
     }
 
@@ -362,13 +367,16 @@ export default class Mixins {
             weight: "font-weight",
             align: "text-align",
             decoration: "text-decoration",
-            
+
         };
         //"dimension", "typography", "decorations"
         for (let section of ["general", "dimension", "typography"]) {
             let obj = context[section];
             for (let key in obj) {
                 let label = labels[key] || key;
+                if(["Cell"].includes(context.control) && key == "width") {
+                    label = "flex-basis";
+                }
                 if (obj[key]) {
                     if (UnitFields.includes(key)) {
                         if (obj[key]["value"] && obj[key]["unit"]) {
@@ -409,22 +417,53 @@ export default class Mixins {
         context.id = "#" + id;
         context.control = control;
 
+        let custom: any = this.cstStyleJson[context.id] || {};
+        //console.log("custom" , custom)
+
         for (let section of ["general", "dimension", "typography"]) {
             let obj = context[section];
             for (let key in obj) {
                 let label = labels[key] || key;
-                let value = cssStyle.getPropertyValue(label);
-                if(section == "typography") {
-                    if(key == "font") {
-                        value = value.replace('"', "").replace('"', "");
-                    }
-                    console.log("value", label, value);
+                if(["Cell"].includes(context.control) && key == "width") {
+                    label = "flex-basis";
                 }
-               
+                let value = cssStyle.getPropertyValue(label);
+                if(["dimension", "typography"].includes(section)) {
+                    switch (key) {
+                        case "width":
+                            if(["Cell"].includes(context.control)) {
+                                value = custom[label] || value || "100%";
+                            } else {
+                                value = "";
+                            }
+                            break;
+                        case "height":
+                            value = custom[label] || "";
+                            break;
+                        case "font":
+                            value = custom[label] || "Arial, Helvetica, sans-serif";
+                            break;
+                        case "size":
+                            value = custom[label] || "";
+                            break;
+                        case "weight":
+                            value = custom[label] || "400";
+                            break;
+                        case "align":
+                            value = custom[label] || "left";
+                            break;
+                        case "decoration":
+                            value = custom[label] || "none";
+                            break;
+                        default:
+                            value = custom[label] || value;
+                            break;
+                    }
+                }
 
                 if (UnitFields.includes(key)) {
-                    let num = value == "auto" ? "" : value.replace(/[^0-9\.]+/g, "");
-                    let unit = value == "auto" ? "" : value.replace(num, "");
+                    let num = value == "auto" || value == "0px" ? "" : value.replace(/[^0-9\.]+/g, "");
+                    let unit = value == "auto" || value == "0px" ? "" : value.replace(num, "");
                     obj[key]["value"] = num;
                     obj[key]["unit"] = unit;
                 } else if (SubUnitFields.includes(key)) {
@@ -445,7 +484,7 @@ export default class Mixins {
             }
         }
 
-        console.log("context", context);
+        //console.log("context", context);
 
         return context;
     }

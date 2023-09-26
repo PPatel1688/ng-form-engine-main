@@ -16,13 +16,13 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     @ViewChild('ngContext') ngContext?: NgForm;
 
+    public context: any = null;
     _onChangeSubscription: any = null;
 
     public toolBarAction: string = "block";
     public subBlockToolBar: string = "basic";
     public subStyleToolBar: string = "settings";
 
-    public context: any = null;
     /****/
 
     get nePlaceHolder() {
@@ -35,6 +35,10 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     get neToolBar() {
         return this.refToolBar?.nativeElement as HTMLElement;
+    }
+
+    get isSelected() {
+        return this.selected != null;
     }
 
     constructor() {
@@ -134,7 +138,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
             toolbar.style.top = element.height + 'px';
             toolbar.style.left = (element.width - bToolbar.width) + '0px';
-
+            
             this.context = this.SetStyleContext();
         }
     }
