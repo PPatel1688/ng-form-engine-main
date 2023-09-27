@@ -24,7 +24,10 @@ export default class Mixins {
         CheckboxList: "ctrCheckboxList"
     }
 
+    public context: any = null;
+
     constructor() {
+        this.context = this.GetStyleContext();
     }
 
 
@@ -318,7 +321,7 @@ export default class Mixins {
         let context = {
             id: null,
             field: null,
-            control: null,
+            node: null,
             general: {
                 float: null,
                 display: null,
@@ -401,7 +404,7 @@ export default class Mixins {
         return Style;
     }
 
-    _StyleObjectToContext(id: any, control: any, cssStyle: any) {
+    _StyleObjectToContext(context: any, id: any, node: any, cssStyle: any) {
         let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
         let SubUnitFields: any = ["margin", "padding"];
         let labels: any = {
@@ -413,12 +416,11 @@ export default class Mixins {
             align: "text-align",
             decoration: "text-decoration"
         };
-        let context: any = this.GetStyleContext();
+        //let context: any = this.GetStyleContext();
         context.id = "#" + id;
-        context.control = control;
+        context.node = node;
 
         let custom: any = this.cstStyleJson[context.id] || {};
-        //console.log("custom" , custom)
 
         for (let section of ["general", "dimension", "typography"]) {
             let obj = context[section];
@@ -483,9 +485,6 @@ export default class Mixins {
                 }
             }
         }
-
-        //console.log("context", context);
-
         return context;
     }
 }

@@ -362,25 +362,23 @@ export default class FrameWrapper extends Mixins {
 
     SetStyleContext() {
         if (this.selected == null) {
-            return null;
+            return false;
         }
         let id = this.selected.getAttribute('id');
-        let control = this.selected.getAttribute('data-fe-type');
+        let node = this.selected.getAttribute('data-fe-type');
         let cssStyle = this.document.defaultView.getComputedStyle(this.selected, null);
-        if (control != "Wrapper") {
+        if (node != "Wrapper") {
             //this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-            return this._StyleObjectToContext(id, control, cssStyle);
+            this._StyleObjectToContext(this.context, id, node, cssStyle);
+            return true;
         } else {
-            return null;
+            return false;
         }
     }
 
     UpdateStyleContext(context: any) {
         this.cstStyleJson[context.id] = this._ContextToStyleObject(context);
-
-        console.log("this.cstStyleJson[context.id]", this.cstStyleJson[context.id]);
         this.cstStyle.innerText = this.jsonToCSS(this.cstStyleJson);
-        //console.log("this.cstStyleJson", this.cstStyle.innerText);
     }
 
     destroy() {

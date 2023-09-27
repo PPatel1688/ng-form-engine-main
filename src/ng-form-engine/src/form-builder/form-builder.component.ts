@@ -6,7 +6,8 @@ import { NgForm } from "@angular/forms";
     selector: "ng-form-builder",
     templateUrl: "./form-builder.component.html",
     styleUrls: ["./form-builder.component.scss"],
-    providers: []
+    providers: [],
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('refFrameWrapper') refFrameWrapper?: ElementRef<any>;
@@ -14,12 +15,14 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     @ViewChild('refHoverFrame') refHoverFrame?: ElementRef<any>;
     @ViewChild('refToolBar') refToolBar?: ElementRef<any>;
 
+    @ViewChild('refPanelBlock') refPanelBlock?: ElementRef<any>;
+    @ViewChild('refPanelStyle') refPanelStyle?: ElementRef<any>;
+
     @ViewChild('ngContext') ngContext?: NgForm;
 
-    public context: any = null;
     _onChangeSubscription: any = null;
 
-    public toolBarAction: string = "block";
+    public toolBarAction: any = "block";
     public subBlockToolBar: string = "basic";
     public subStyleToolBar: string = "settings";
 
@@ -37,13 +40,20 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         return this.refToolBar?.nativeElement as HTMLElement;
     }
 
+    get nePanelBlock() {
+        return this.refPanelBlock?.nativeElement as HTMLElement;
+    }
+
+    get nePanelStyle() {
+        return this.refPanelStyle?.nativeElement as HTMLElement;
+    }
+
     get isSelected() {
         return this.selected != null;
     }
 
     constructor() {
         super();
-        //this.context = this._GetNgModelContext();
     }
 
     ngOnInit() {
@@ -51,49 +61,10 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     ngAfterViewInit() {
+        this.nePanelBlock.style.display = "block";
+        this.nePanelStyle.style.display = "none";
         this._initializeEditor();
     }
-
-    /*
-    _GetNgModelContext() {
-        let context = {
-            id: null,
-            control: null,
-            general: {
-                float: null,
-                display: null,
-                position: null,
-                top: { value: null, unit: 'px' },
-                right: { value: null, unit: "px" },
-                left: { value: null, unit: "px" },
-                bottom: { value: null, unit: "px" },
-            },
-            dimension: {
-                width: { value: null, unit: "px" },
-                height: { value: null, unit: "px" },
-                maxWidth: { value: null, unit: "px" },
-                minHeight: { value: null, unit: "px" },
-                margin: { top: { value: null, unit: "px" }, right: { value: null, unit: "px" }, left: { value: null, unit: "px" }, bottom: { value: null, unit: "px" }, },
-                padding: { top: { value: null, unit: "px" }, right: { value: null, unit: "px" }, left: { value: null, unit: "px" }, bottom: { value: null, unit: "px" }, }
-            },
-            typography: {
-                font: null,
-                size: { value: null, unit: "" },
-                weight: null,
-                color: null,
-                align: null,
-                decoration: null,
-            },
-            decorations: {
-                opacity: null,
-                borderRadius: { tl: null, tr: null, br: null, bl: null, },
-                border: { width: null, style: null, color: null, },
-                background: null
-            }
-        };
-
-        return context;
-    }*/
 
     _initializeEditor() {
         let that = this;
@@ -138,8 +109,8 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
             toolbar.style.top = element.height + 'px';
             toolbar.style.left = (element.width - bToolbar.width) + '0px';
-            
-            this.context = this.SetStyleContext();
+
+            this.onToolbarAction('style');
         }
     }
 
@@ -201,7 +172,36 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     onToolbarAction(action: any) {
-        this.toolBarAction = action;
+        let that: any = this;
+
+        that.nePanelBlock.style.display = "none";
+        that.nePanelStyle.style.display = "none";
+
+        switch (action) {
+            case "block":
+                that.subBlockToolBar = "basic";
+                that.nePanelBlock.style.display = "block";
+                that.toolBarAction = "block";
+                break;
+            case "style":
+                let isValid = this.SetStyleContext();
+                if (isValid) {
+                    that.subStyleToolBar = "settings";
+                    that.nePanelStyle.style.display = "block";
+                    setTimeout(() => { 
+                        this.ngContext?.resetForm(this.context);
+                    });
+                    
+                    that.toolBarAction = "style";
+                } else {
+                    that.subBlockToolBar = "basic";
+                    that.nePanelBlock.style.display = "block";
+                    that.toolBarAction = "block";
+                }
+                break;
+            default:
+                break;
+        }
         console.log("action", action);
     }
 
@@ -309,15 +309,13 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         let ctrUnit = ctrField?.controls["unit"] as any;
         let value = this.getNumericValue(ctrValue.value || "0") - 1;
 
-        console.log("down", value);
-
         if (isNegative) {
             ctrValue.setValue(value.toString());
             if (ctrUnit.value == "") {
                 ctrUnit.setValue("px");
             }
         } else {
-            if(value > 0) {
+            if (value > 0) {
                 ctrValue.setValue(value.toString());
                 if (ctrUnit.value == "") {
                     ctrUnit.setValue("px");
@@ -328,12 +326,11 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                     ctrUnit.setValue("");
                 }
             }
-            
+
         }
     }
 
     onContextChange(form: NgForm) {
-        console.log(form.value);
         this.UpdateStyleContext(this.context);
     }
 
