@@ -15,7 +15,7 @@ export default class FrameWrapper extends Mixins {
     private onUpdateDocument = new BehaviorSubject<any>(null);
     private _onUpdateDocumentSubscription: any = null;
     public onChange = new BehaviorSubject<any>(null);
-    
+
 
     drag: any = {
         parent: null,
@@ -41,8 +41,9 @@ export default class FrameWrapper extends Mixins {
     }
 
     private _RenderDocument(source: any) {
-        let isDefault = source ? false : true;
-        let template = new DOMParser().parseFromString(source || HTMLTemplate, 'text/html');;
+        let store = source || this.GetStoreDocument();
+        let isDefault = store ? false : true;
+        let template = new DOMParser().parseFromString(store || HTMLTemplate, 'text/html');
 
         if (isDefault) {
             let styleHTML = template.createElement("style");
@@ -55,7 +56,7 @@ export default class FrameWrapper extends Mixins {
             this.document.head.appendChild(styleBuilder);
 
             let styleCustom = template.createElement("style");
-            styleCustom.innerText = "body{margin:0;background-color:#fff;} body{margin:0;}";
+            styleCustom.innerText = "";
             styleCustom.setAttribute("id", "custom");
             this.document.head.appendChild(styleCustom);
             this.cstStyle = styleCustom;
@@ -68,6 +69,10 @@ export default class FrameWrapper extends Mixins {
             this.document.body.setAttribute("data-fe-type", "Body");
             this.document.body.classList.add("fe-dashed");
         } else {
+            let styleHTML = template.createElement("style");
+            styleHTML.innerText = StyleHTML.replace(/(\r\n|\n|\r)/gm, "");
+            this.document.head.appendChild(styleHTML);
+
             let styleBuilder = template.createElement("style");
             styleBuilder.innerText = StyleBuilder.replace(/(\r\n|\n|\r)/gm, "");
             styleBuilder.setAttribute("id", "system");
@@ -78,8 +83,20 @@ export default class FrameWrapper extends Mixins {
                 styleCustom = template.createElement("style");
                 styleCustom.innerText = "";
                 styleCustom.setAttribute("id", "custom");
-                this.document.head.appendChild(styleCustom);
             }
+            this.document.head.appendChild(styleCustom);
+
+            let body = template.body;
+            let id = body.getAttribute("id");
+            this.document.body.setAttribute("id", id);
+            this.document.body.setAttribute("data-fe-type", "Body");
+            this.document.body.classList.add("fe-dashed");
+
+            let wrapper = body.querySelector('[data-fe-type="Wrapper"]');
+            if (wrapper == null) {
+                wrapper = this.ctrMainWrapper();
+            }
+            this.document.body.appendChild(wrapper);
             this.cstStyle = styleCustom;
         }
         this.SetCustomCSS(this.cstStyle.innerText);
@@ -204,6 +221,7 @@ export default class FrameWrapper extends Mixins {
                 this.drag.target.appendChild(this.selected);
                 //element.classList.remove("fe-freezed");
                 //this.selected.click();
+                this.onUpdateDocument.next({ action: "update" });
             }
         }
         this.drag.parent = null;
@@ -321,7 +339,16 @@ export default class FrameWrapper extends Mixins {
     }
 
     private _onUpdateDocument(event: any) {
-
+        if (event == null) {
+            return;
+        }
+        switch (event.action) {
+            case "update":
+                this.StoreDocument();
+                break;
+            default:
+                break;
+        }
     }
 
     SelectParent(event: any) {
@@ -339,6 +366,7 @@ export default class FrameWrapper extends Mixins {
             node.id = id;
             parent.appendChild(node);
             node.click();
+            this.onUpdateDocument.next({ action: "update" });
         }
     }
 
@@ -363,6 +391,7 @@ export default class FrameWrapper extends Mixins {
             this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
             this.selected.remove();
             this.selected = null;
+            this.onUpdateDocument.next({ action: "update" });
         }
     }
 
@@ -385,8 +414,9 @@ export default class FrameWrapper extends Mixins {
     UpdateStyleContext(context: any) {
         this.cstStyleJson[context.id] = this.ContextToStyleObject(context);
         this.cstStyle.innerText = this.ConvertJsonToCSS(this.cstStyleJson);
+        this.onUpdateDocument.next({ action: "update" });
     }
-    
+
     destroy() {
         this._UnbindDocEvents();
         this._onUpdateDocumentSubscription.unsubscribe();

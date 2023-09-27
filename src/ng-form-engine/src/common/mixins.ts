@@ -483,4 +483,23 @@ export default class Mixins {
         }
         return context;
     }
+
+    /********/
+
+    StoreDocument() {
+        let source = this.document.documentElement.outerHTML
+        let template = new DOMParser().parseFromString(source, 'text/html');
+        let styleSystem = template.getElementById("system");
+        if (styleSystem) {
+            styleSystem.remove();
+        }
+        let outerHTML = template.documentElement.outerHTML;
+        outerHTML = outerHTML.replace(/\bfe-selected\b/g,'');
+        outerHTML = outerHTML.replace(/\bfe-hovered\b/g,'');
+        localStorage.setItem("fe-document", outerHTML);
+    }
+
+    GetStoreDocument() {
+        return localStorage.getItem("fe-document") || null;
+    }
 }
