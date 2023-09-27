@@ -417,6 +417,19 @@ export default class FrameWrapper extends Mixins {
         this.onUpdateDocument.next({ action: "update" });
     }
 
+    ClearDocument() {
+        let wrapper = this.document.body.querySelector('[data-fe-type="Wrapper"]');
+        if (wrapper) {
+            wrapper.click();
+        }
+        while (wrapper.hasChildNodes()) {
+            wrapper.removeChild(wrapper.firstChild);
+        }
+        this.cstStyle.innerText = "";
+        this.cstStyleJson = {};
+        this.onUpdateDocument.next({ action: "update" });
+    }
+    
     destroy() {
         this._UnbindDocEvents();
         this._onUpdateDocumentSubscription.unsubscribe();

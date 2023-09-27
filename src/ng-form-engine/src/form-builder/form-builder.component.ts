@@ -201,7 +201,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                     break;
             }
         } else {
-            
+            this.ClearDocument();
         }
         console.log("action", action);
     }
