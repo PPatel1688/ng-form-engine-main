@@ -27,7 +27,7 @@ export default class Mixins {
     public context: any = null;
 
     constructor() {
-        this.context = this.GetStyleContext();
+        this.context = this._GetStyleContext();
     }
 
 
@@ -260,7 +260,7 @@ export default class Mixins {
         return "fe" + (Math.random() + 1.1).toString(36).slice(-3);
     }
 
-    createDomRow() {
+    private createDomRow() {
         let id = this.getNewId();
         let source = this.document.createElement("div");
         source.setAttribute("id", id);
@@ -272,7 +272,7 @@ export default class Mixins {
         return source;
     }
 
-    createDomColumn(index: any, style: any = null) {
+    private createDomColumn(index: any, style: any = null) {
         let id = this.getNewId();
         let source = this.document.createElement("div");
         source.setAttribute("id", id);
@@ -295,29 +295,7 @@ export default class Mixins {
 
     /********/
 
-    getCustomCSSString() {
-        return this.jsonToCSS(this.cstStyleJson);
-    }
-
-    jsonToCSS(data: any) {
-        const selectors = Object.keys(data);
-        return selectors.map((selector: any) => {
-            const definition = data[selector];
-            const rules = Object.keys(definition);
-            const result = rules.map((rule) => { return `${rule}:${definition[rule]}` }).join(';');
-            return `${selector}{${result}}`;
-        }).join('');
-    }
-
-    setCustomCSS(data: any = "") {
-        try {
-            this.cstStyleJson = cssToJSON(data);
-        } catch (error) {
-            console.log("error", error);
-        }
-    }
-
-    GetStyleContext() {
+    private _GetStyleContext() {
         let context = {
             id: null,
             field: null,
@@ -358,7 +336,25 @@ export default class Mixins {
         return context;
     }
 
-    _ContextToStyleObject(context: any) {
+    ConvertJsonToCSS(data: any) {
+        const selectors = Object.keys(data);
+        return selectors.map((selector: any) => {
+            const definition = data[selector];
+            const rules = Object.keys(definition);
+            const result = rules.map((rule) => { return `${rule}:${definition[rule]}` }).join(';');
+            return `${selector}{${result}}`;
+        }).join('');
+    }
+
+    SetCustomCSS(data: any = "") {
+        try {
+            this.cstStyleJson = cssToJSON(data);
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+
+    ContextToStyleObject(context: any) {
         let Style: any = {};
         let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
         let SubUnitFields: any = ["margin", "padding"];
@@ -404,7 +400,7 @@ export default class Mixins {
         return Style;
     }
 
-    _StyleObjectToContext(context: any, id: any, node: any, cssStyle: any) {
+    StyleObjectToContext(context: any, id: any, node: any, cssStyle: any) {
         let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
         let SubUnitFields: any = ["margin", "padding"];
         let labels: any = {

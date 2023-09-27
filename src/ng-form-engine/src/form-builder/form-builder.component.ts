@@ -184,7 +184,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 that.toolBarAction = "block";
                 break;
             case "style":
-                let isValid = this.SetStyleContext();
+                let isValid = this.GetStyleContext();
                 if (isValid) {
                     that.subStyleToolBar = "settings";
                     that.nePanelStyle.style.display = "block";

@@ -12,7 +12,10 @@ export class FrameEvent {
 
 export default class FrameWrapper extends Mixins {
     //public onChange: EventEmitter<FrameEvent> = new EventEmitter<FrameEvent>();
+    private onUpdateDocument = new BehaviorSubject<any>(null);
+    private _onUpdateDocumentSubscription: any = null;
     public onChange = new BehaviorSubject<any>(null);
+    
 
     drag: any = {
         parent: null,
@@ -25,10 +28,9 @@ export default class FrameWrapper extends Mixins {
     selected: any = null;
     hovered: any = null;
 
-    
-
     constructor() {
         super();
+        this._onUpdateDocumentSubscription = this.onUpdateDocument.subscribe(this._onUpdateDocument.bind(this));
     }
 
     initFrame(el: any, source: any = null) {
@@ -38,7 +40,7 @@ export default class FrameWrapper extends Mixins {
         this._BindDocEvents();
     }
 
-    _RenderDocument(source: any) {
+    private _RenderDocument(source: any) {
         let isDefault = source ? false : true;
         let template = new DOMParser().parseFromString(source || HTMLTemplate, 'text/html');;
 
@@ -80,7 +82,7 @@ export default class FrameWrapper extends Mixins {
             }
             this.cstStyle = styleCustom;
         }
-        this.setCustomCSS(this.cstStyle.innerText);
+        this.SetCustomCSS(this.cstStyle.innerText);
     }
 
     private _BindDocEvents() {
@@ -318,6 +320,10 @@ export default class FrameWrapper extends Mixins {
         return data;
     }
 
+    private _onUpdateDocument(event: any) {
+
+    }
+
     SelectParent(event: any) {
         if (this.selected) {
             let parent = this.selected.parentElement as HTMLElement;
@@ -360,7 +366,7 @@ export default class FrameWrapper extends Mixins {
         }
     }
 
-    SetStyleContext() {
+    GetStyleContext() {
         if (this.selected == null) {
             return false;
         }
@@ -369,7 +375,7 @@ export default class FrameWrapper extends Mixins {
         let cssStyle = this.document.defaultView.getComputedStyle(this.selected, null);
         if (node != "Wrapper") {
             //this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-            this._StyleObjectToContext(this.context, id, node, cssStyle);
+            this.StyleObjectToContext(this.context, id, node, cssStyle);
             return true;
         } else {
             return false;
@@ -377,11 +383,12 @@ export default class FrameWrapper extends Mixins {
     }
 
     UpdateStyleContext(context: any) {
-        this.cstStyleJson[context.id] = this._ContextToStyleObject(context);
-        this.cstStyle.innerText = this.jsonToCSS(this.cstStyleJson);
+        this.cstStyleJson[context.id] = this.ContextToStyleObject(context);
+        this.cstStyle.innerText = this.ConvertJsonToCSS(this.cstStyleJson);
     }
-
+    
     destroy() {
         this._UnbindDocEvents();
+        this._onUpdateDocumentSubscription.unsubscribe();
     }
 }
