@@ -382,7 +382,7 @@ export default class FrameWrapper extends Mixins {
                 that.selected.classList.remove("fe-selected");
             }
             that.selected = that[that.blockType[block]]();
-            event.dataTransfer.setData("text", that.selected.id || that.selected.for);
+            event.dataTransfer.setData("text", that.selected.id);
         }
     }
 
@@ -429,7 +429,7 @@ export default class FrameWrapper extends Mixins {
         this.cstStyleJson = {};
         this.onUpdateDocument.next({ action: "update" });
     }
-    
+
     destroy() {
         this._UnbindDocEvents();
         this._onUpdateDocumentSubscription.unsubscribe();

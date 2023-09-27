@@ -177,7 +177,36 @@ export default class Mixins {
     }
 
     public ctrCheckbox(self: any = true, name: any = "") {
+        let main = this.document.createElement("div");
+        if(self) {
+            let id = this.getNewId();
+            main.setAttribute("id", id);
+            main.setAttribute("data-fe-highlightable", "true");
+            main.setAttribute("data-fe-type", "Checkbox");
+            main.setAttribute("draggable", "true");
+        }
+        
+        let ctrId = "checkbox-" + this.getNewId();
+        let label = this.document.createElement("label");
+        let text = this.document.createTextNode("value");
+        label.setAttribute("for", ctrId);
+
+        let source = this.document.createElement("input");
+        source.setAttribute("id", ctrId);
+        source.setAttribute("name", name || ctrId);
+        source.setAttribute("type", "checkbox");
+
+        label.appendChild(source);
+        label.appendChild(text);
+
+        main.appendChild(label);
+        return main;
+    }
+
+
+    public ctrCheckbox1(self: any = true, name: any = "") {
         let id = this.getNewId();
+        
         let label = this.document.createElement("label");
         let text = this.document.createTextNode("value");
         label.setAttribute("for", id);
@@ -200,25 +229,30 @@ export default class Mixins {
     }
 
     public ctrRadio(self: any = true, name: any = "") {
-        let id = this.getNewId();
+        let main = this.document.createElement("div");
+        if(self) {
+            let id = this.getNewId();
+            main.setAttribute("id", id);
+            main.setAttribute("data-fe-highlightable", "true");
+            main.setAttribute("data-fe-type", "Radio");
+            main.setAttribute("draggable", "true");
+        }
+        
+        let ctrId = "radio-" + this.getNewId();
         let label = this.document.createElement("label");
         let text = this.document.createTextNode("value");
-        label.setAttribute("for", id);
-        label.setAttribute("data-fe-type", "Radio");
-        if (self) {
-            label.setAttribute("data-fe-highlightable", "true");
-            label.setAttribute("draggable", "true");
-        }
+        label.setAttribute("for", ctrId);
 
         let source = this.document.createElement("input");
-        source.setAttribute("id", id);
-        source.setAttribute("name", name || id);
+        source.setAttribute("id", ctrId);
+        source.setAttribute("name", name || ctrId);
         source.setAttribute("type", "radio");
 
         label.appendChild(source);
         label.appendChild(text);
 
-        return label;
+        main.appendChild(label);
+        return main;
     }
 
     public ctrRadioList() {
@@ -429,17 +463,18 @@ export default class Mixins {
                 if(["dimension", "typography"].includes(section)) {
                     switch (key) {
                         case "width":
-                            if(["Cell"].includes(context.control)) {
+                            /*if(["Cell"].includes(context.control)) {
                                 value = custom[label] || value || "100%";
                             } else {
                                 value = "";
-                            }
+                            }*/
+                            value = custom[label] || "100%";
                             break;
                         case "height":
                             value = custom[label] || "";
                             break;
                         case "font":
-                            value = custom[label] || "Arial, Helvetica, sans-serif";
+                            value = custom[label] || "";
                             break;
                         case "size":
                             value = custom[label] || "";
@@ -481,6 +516,7 @@ export default class Mixins {
                 }
             }
         }
+        console.log("context", context);
         return context;
     }
 

@@ -332,6 +332,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     onContextChange(form: NgForm) {
+        //this.context = form.value;
         this.UpdateStyleContext(this.context);
     }
 
