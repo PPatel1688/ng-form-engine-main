@@ -20,7 +20,7 @@
     background-color: #39B566;
 }
 
-.fe-cv-canvas {
+.fe-canvas {
     box-sizing: border-box;
     width: 85%;
     height: calc(100% - 40px);
@@ -32,10 +32,10 @@
     top: 40px;
 }
 
-.fe-cv-canvas * {
+.fe-canvas * {
     box-sizing: border-box;
 }
-.fe-cv-canvas__frames {
+.fe-canvas-frame {
     position: absolute;
     top: 0;
     left: 0;
@@ -67,7 +67,7 @@
     left: 0;
     right: 0;
 }
-.fe-cv-canvas-bg {
+.fe-canvas-bg {
     background-color: rgba(0,0,0,.15);
 }
 
@@ -97,7 +97,6 @@
 }
 
 .fe-pn-views {
-    border-bottom: 2px solid rgba(0, 0, 0, .2);
     right: 0;
     width: 15%;
     z-index: 4;
@@ -105,17 +104,16 @@
 
 .fe-pn-views-container {
     height: 100%;
-    padding: 42px 0 0;
+    padding: 40px 0 0;
     right: 0;
     width: 15%;
     overflow: auto;
-    box-shadow: 0 0 5px rgba(0, 0, 0, .2);
 }
 
 .fe-pn-buttons {
     align-items: center;
     display: flex;
-    justify-content: space-between;
+    justify-content: right;
 }
 
 .fe-pn-btn {

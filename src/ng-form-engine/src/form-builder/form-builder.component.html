@@ -1,8 +1,8 @@
 <div class="fe-container">
     <div class="fe-editor fe-one-bg fe-two-color">
-        <div class="fe-cv-canvas fe-cv-canvas-bg">
-            <div class="fe-cv-canvas__frames">
-                <div class="fe-frames">
+        <div class="fe-canvas fe-canvas-bg">
+            <div class="fe-canvas-frame">
+                <div class="fe-frame">
                     <div class="fe-frame-wrapper" #refFrameWrapper>
                         <iframe allowfullscreen="allowfullscreen" class="fe-frame"></iframe>
                     </div>
@@ -44,15 +44,15 @@
             </div>
         </div>
         <div class="fe-pn-panels">
-            <div class="fe-pn-panel fe-pn-commands fe-pn-height fe-one-bg fe-two-color"></div>
+            <div class="fe-pn-panel fe-pn-commands fe-pn-height fe-one-bg fe-two-color">
+            </div>
             <div class="fe-pn-panel fe-pn-options fe-pn-height fe-one-bg fe-two-color">
-                <div class="fe-pn-buttons">
-                    <span class="fe-pn-btn">
-                    </span>
-                </div>
             </div>
             <div class="fe-pn-panel fe-pn-views fe-pn-height fe-one-bg fe-two-color">
                 <div class="fe-pn-buttons">
+                    <span title="Clear Document" data-tooltip-pos="bottom" class="fe-pn-btn" (click)="onToolbarAction('clear')">
+                        <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"></path></svg>
+                    </span>
                     <span title="Open Style Manager" data-tooltip-pos="bottom" class="fe-pn-btn" [ngClass]="{ 'fe-pn-active' : toolBarAction == 'style' }" (click)="onToolbarAction('style')">
                         <svg style="display: block; max-width:22px" viewBox="0 0 24 24"><path fill="currentColor" d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"></path></svg>
                     </span>

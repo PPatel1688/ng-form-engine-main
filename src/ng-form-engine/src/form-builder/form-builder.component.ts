@@ -173,34 +173,35 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     onToolbarAction(action: any) {
         let that: any = this;
+        if(action != "clear") {
+            that.nePanelBlock.style.display = "none";
+            that.nePanelStyle.style.display = "none";
 
-        that.nePanelBlock.style.display = "none";
-        that.nePanelStyle.style.display = "none";
-
-        switch (action) {
-            case "block":
-                that.subBlockToolBar = "basic";
-                that.nePanelBlock.style.display = "block";
-                that.toolBarAction = "block";
-                break;
-            case "style":
-                let isValid = this.GetStyleContext();
-                if (isValid) {
-                    that.subStyleToolBar = "settings";
-                    that.nePanelStyle.style.display = "block";
-                    setTimeout(() => { 
-                        this.ngContext?.resetForm(this.context);
-                    });
-                    
-                    that.toolBarAction = "style";
-                } else {
+            switch (action) {
+                case "block":
                     that.subBlockToolBar = "basic";
                     that.nePanelBlock.style.display = "block";
                     that.toolBarAction = "block";
-                }
-                break;
-            default:
-                break;
+                    break;
+                case "style":
+                    let isValid = this.GetStyleContext();
+                    if (isValid) {
+                        that.subStyleToolBar = "settings";
+                        that.nePanelStyle.style.display = "block";
+                        setTimeout(() => { 
+                            this.ngContext?.resetForm(this.context);
+                        });
+                        
+                        that.toolBarAction = "style";
+                    } else {
+                        that.subBlockToolBar = "basic";
+                        that.nePanelBlock.style.display = "block";
+                        that.toolBarAction = "block";
+                    }
+                    break;
+            }
+        } else {
+            
         }
         console.log("action", action);
     }
