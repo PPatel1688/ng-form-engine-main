@@ -23,9 +23,6 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     _onChangeSubscription: any = null;
 
     public toolBarAction: any = "block";
-    public subBlockToolBar: string = "basic";
-    public subStyleToolBar: string = "settings";
-
     /****/
 
     get nePlaceHolder() {
@@ -110,7 +107,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
             toolbar.style.top = element.height + 'px';
             toolbar.style.left = (element.width - bToolbar.width) + '0px';
 
-            this.onToolbarAction('style');
+            //this.onToolbarAction('style');
         }
     }
 
@@ -179,14 +176,12 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
             switch (action) {
                 case "block":
-                    that.subBlockToolBar = "basic";
                     that.nePanelBlock.style.display = "block";
                     that.toolBarAction = "block";
                     break;
                 case "style":
                     let isValid = this.GetStyleContext();
                     if (isValid) {
-                        that.subStyleToolBar = "settings";
                         that.nePanelStyle.style.display = "block";
                         setTimeout(() => { 
                             this.ngContext?.resetForm(this.context);
@@ -194,7 +189,6 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                         
                         that.toolBarAction = "style";
                     } else {
-                        that.subBlockToolBar = "basic";
                         that.nePanelBlock.style.display = "block";
                         that.toolBarAction = "block";
                     }

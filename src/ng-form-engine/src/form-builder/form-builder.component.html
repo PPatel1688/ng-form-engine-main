@@ -69,10 +69,10 @@
                     <div class="fe-blocks-cs fe-one-bg fe-two-color">
                         <div class="fe-block-categories">
                             <div class="fe-block-category">
-                                <div class="fe-title" data-title="" (click)="subBlockToolBar = 'basic'">
+                                <div class="fe-title" data-title="">
                                     Basic
                                 </div>
-                                <div class="fe-blocks-c" *ngIf="subBlockToolBar == 'basic'">
+                                <div class="fe-blocks-c">
                                     <div class="fe-block" title="1 Column" draggable="true" (dragstart)="onMove($event, 'OneColumn')">
                                         <div class="fe-block__media">
                                             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M2 20h20V4H2v16Zm-1 0V4a1 1 0 0 1 1-1h20a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1Z"></path></svg>
@@ -124,10 +124,10 @@
                                 </div>
                             </div>
                             <div class="fe-block-category">
-                                <div class="fe-title" data-title="" (click)="subBlockToolBar = 'forms'">
+                                <div class="fe-title" data-title="">
                                     Forms
                                 </div>
-                                <div class="fe-blocks-c" *ngIf="subBlockToolBar == 'forms'">
+                                <div class="fe-blocks-c">
                                     <div class="fe-block" title="Input" draggable="true" (dragstart)="onMove($event, 'Input')">
                                         <div class="fe-block__media">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 9c0-.6-.5-1-1.3-1H3.4C2.5 8 2 8.4 2 9v6c0 .6.5 1 1.3 1h17.4c.8 0 1.3-.4 1.3-1V9zm-1 6H3V9h18v6z"></path><path d="M4 10h1v4H4z"></path></svg>
@@ -173,10 +173,7 @@
                     <form #ngContext="ngForm" novalidate [ngFormOptions]="{ updateOn: 'change' }" (change)="onContextChange(ngContext)">
                         <div class="fe-blocks-cs fe-one-bg fe-two-color">
                             <div class="fe-block-category">
-                                <div class="fe-title" data-title="" (click)="subStyleToolBar = 'settings'">
-                                    Settings
-                                </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'settings'">
+                                <div class="fe-sm-properties">
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Id </span>
@@ -201,14 +198,33 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full">
+                                    <div class="fe-sm-property fe-sm-property--full" *ngIf="['Input', 'Textarea', 'Checkbox', 'Radio', 'Radio List', 'Checkbox List'].includes(context.node)">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Mapping field </span>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" placeholder="eg. Text here" name="field" [(ngModel)]="context.field">
+                                                    <input type="text" autocomplete="off" placeholder="eg. Text here" name="field" [(ngModel)]="context.field">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fe-block-category" ngModelGroup="settings">
+                                <div class="fe-title" data-title="">
+                                    Settings
+                                </div>
+                                <div class="fe-sm-properties">
+                                    <div class="fe-sm-property fe-sm-property--full">
+                                        <div class="fe-sm-label">
+                                            <span class="fe-sm-icon" title=""> Src </span>
+                                        </div>
+                                        <div class="fe-fields">
+                                            <div class="fe-field">
+                                                <span id="fe-sm-input-holder">
+                                                    <input type="text" name="src" autocomplete="off" [(ngModel)]="context.src">
                                                 </span>
                                             </div>
                                         </div>
@@ -216,10 +232,10 @@
                                 </div>
                             </div>
                             <div class="fe-block-category" ngModelGroup="general">
-                                <div class="fe-title" data-title="" (click)="subStyleToolBar = 'general'">
+                                <div class="fe-title" data-title="">
                                     General
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'general'">
+                                <div class="fe-sm-properties">
                                     <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Float </span>
@@ -416,10 +432,10 @@
                                 </div>
                             </div>
                             <div class="fe-block-category" ngModelGroup="dimension">
-                                <div class="fe-title" data-title="" (click)="subStyleToolBar = 'dimension'">
+                                <div class="fe-title" data-title="">
                                     Dimension
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'dimension'">
+                                <div class="fe-sm-properties">
                                     <div class="fe-sm-property" ngModelGroup="width">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Width </span>
@@ -791,10 +807,10 @@
                                 </div>
                             </div>
                             <div class="fe-block-category" ngModelGroup="typography">
-                                <div class="fe-title" data-title="" (click)="subStyleToolBar = 'typography'">
+                                <div class="fe-title" data-title="">
                                     Typography
                                 </div>
-                                <div class="fe-sm-properties" *ngIf="subStyleToolBar == 'typography'">
+                                <div class="fe-sm-properties">
                                     <div class="fe-sm-property">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Font family </span>

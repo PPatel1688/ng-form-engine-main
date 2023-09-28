@@ -334,6 +334,9 @@ export default class Mixins {
             id: null,
             field: null,
             node: null,
+            settings: {
+                src: null
+            },
             general: {
                 float: null,
                 display: null,
@@ -358,6 +361,36 @@ export default class Mixins {
                 color: null,
                 align: null,
                 decoration: null,
+            }
+        };
+
+        let context1 = {
+            id: null,
+            field: null,
+            node: null,
+            settings: {
+                src: null
+            },
+            style: {
+                float: null,
+                display: null,
+                position: null,
+                top: { value: "", unit: "" },
+                right: { value: "", unit: "" },
+                left: { value: "", unit: "" },
+                bottom: { value: "", unit: "" },
+                width: { value: "", unit: "" },
+                height: { value: "", unit: "" },
+                maxWidth: { value: "", unit: "" },
+                minHeight: { value: "", unit: "" },
+                margin: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" } },
+                padding: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" } },
+                fontFamily: null,
+                fontSize: { value: "", unit: "" },
+                fontWeight: null,
+                color: null,
+                textAlign: null,
+                textDecoration: null
             }
         };
 
@@ -468,7 +501,7 @@ export default class Mixins {
                             } else {
                                 value = "";
                             }*/
-                            value = custom[label] || "100%";
+                            value = custom[label] || "";
                             break;
                         case "height":
                             value = custom[label] || "";

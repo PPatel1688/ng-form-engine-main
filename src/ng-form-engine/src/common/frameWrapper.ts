@@ -38,6 +38,8 @@ export default class FrameWrapper extends Mixins {
         this.document = this.frame?.contentDocument as Document;
         this._RenderDocument(source);
         this._BindDocEvents();
+
+        console.log(this.frame?.contentDocument);
     }
 
     private _RenderDocument(source: any) {
@@ -142,7 +144,6 @@ export default class FrameWrapper extends Mixins {
         if (event.target.getAttribute('data-fe-highlightable') === "true") {
             this.selected = event.target;
             this.selected.classList.add("fe-selected");
-
             data.clientRect = this.selected.getBoundingClientRect();
             data.display = "block";
             data.node = this.selected.getAttribute('data-fe-type');
@@ -402,6 +403,17 @@ export default class FrameWrapper extends Mixins {
         let id = this.selected.getAttribute('id');
         let node = this.selected.getAttribute('data-fe-type');
         let cssStyle = this.document.defaultView.getComputedStyle(this.selected, null);
+
+        let styleObj = this.selected.style;
+        let list: any = [];
+        for (let i = styleObj.length; i--;) {
+            const nameString = styleObj[i];
+            
+            console.log("nameString", nameString);
+            //styleObj.removeProperty(nameString);
+        }
+        console.log("cssStyle", styleObj);
+
         if (node != "Wrapper") {
             //this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
             this.StyleObjectToContext(this.context, id, node, cssStyle);
