@@ -398,34 +398,81 @@ export default class FrameWrapper extends Mixins {
 
     GetStyleContext() {
         if (this.selected == null) {
-            return false;
+            return null;
         }
-        let id = this.selected.getAttribute('id');
+        let id = "#" + this.selected.getAttribute('id');
         let node = this.selected.getAttribute('data-fe-type');
-        let cssStyle = this.document.defaultView.getComputedStyle(this.selected, null);
-
-        let styleObj = this.selected.style;
-        let list: any = [];
-        for (let i = styleObj.length; i--;) {
-            const nameString = styleObj[i];
-            
-            console.log("nameString", nameString);
-            //styleObj.removeProperty(nameString);
-        }
-        console.log("cssStyle", styleObj);
-
         if (node != "Wrapper") {
-            //this.onChange.next({ element: "toolbar", action: "update", data: { clientRect: null, display: "none" } });
-            this.StyleObjectToContext(this.context, id, node, cssStyle);
-            return true;
+            let context: any = this.cstStyleJson[id] || null;
+            if(context == null) {
+                context = this._GetStyleContext();
+                context.id = id;
+            }
+            context.node = node;
+
+            this.GetNodeSettings(context, this.selected, node);
+            //Other Fields Pending
+            console.log("context", context);
+            return JSON.parse(JSON.stringify(context));
         } else {
-            return false;
+            return null;
         }
     }
 
+    GetNodeSettings(context: any, element: any, node: any) {
+        let settings = JSON.parse(JSON.stringify(context.settings));
+        switch (node) {
+            case "Image":
+                settings.src = element.getAttribute('src');
+                break;
+            case "Input":
+            case "Textarea":
+            case "Checkbox":
+            case "Radio":
+            case "Radio List":
+            case "Checkbox List":
+                settings.field = element.getAttribute('data-fe-field') || "";
+                if(["Radio List", "Checkbox List"].includes(node)) {
+                    let nodes = element.querySelectorAll('input');
+                    if(nodes.length > 0) {
+                        console.log("nodes", nodes);
+                        //settings.groups = [...nodes].map((x: any) => x.value);
+                        settings.groups.push("tets");
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        context.settings = settings;
+    }
+
+    SetNodeSettings(context: any, element: any) {
+        let settings = JSON.parse(JSON.stringify(context.settings));
+        switch (context.node) {
+            case "Image":
+                element.src = settings.src;
+                break;
+            case "Input":
+            case "Textarea":
+            case "Checkbox":
+            case "Radio":
+            case "Radio List":
+            case "Checkbox List":
+                element.setAttribute('data-fe-field', settings.field);
+                break;
+            default:
+                break;
+        }
+    }
+
+
     UpdateStyleContext(context: any) {
-        this.cstStyleJson[context.id] = this.ContextToStyleObject(context);
-        this.cstStyle.innerText = this.ConvertJsonToCSS(this.cstStyleJson);
+        console.log("UpdateStyleContext", context);
+        this.cstStyleJson[context.id] = context;
+        this.SetNodeSettings(context, this.selected);
+        let styles = this.ContextToStyleObject();
+        this.cstStyle.innerText = this.ConvertJsonToCSS(styles);
         this.onUpdateDocument.next({ action: "update" });
     }
 

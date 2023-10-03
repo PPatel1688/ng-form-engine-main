@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy } from "@angular/core";
+import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import FrameWrapper from "../common/frameWrapper";
 import { NgForm } from "@angular/forms";
 
@@ -23,6 +23,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     _onChangeSubscription: any = null;
 
     public toolBarAction: any = "block";
+    public isValid: any = false;
     /****/
 
     get nePlaceHolder() {
@@ -49,12 +50,15 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         return this.selected != null;
     }
 
-    constructor() {
+    constructor(private changeDetectorRef: ChangeDetectorRef) {
         super();
     }
 
     ngOnInit() {
-
+        this.ngContext?.form.valueChanges.subscribe((value) => {
+            console.log("test", value);
+            this.changeDetectorRef.detectChanges();
+        });
     }
 
     ngAfterViewInit() {
@@ -170,7 +174,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
     onToolbarAction(action: any) {
         let that: any = this;
-        if(action != "clear") {
+        if (action != "clear") {
             that.nePanelBlock.style.display = "none";
             that.nePanelStyle.style.display = "none";
 
@@ -180,13 +184,15 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                     that.toolBarAction = "block";
                     break;
                 case "style":
-                    let isValid = this.GetStyleContext();
-                    if (isValid) {
+                    that.isValid = false;
+                    let context = this.GetStyleContext();
+                    if (context) {
                         that.nePanelStyle.style.display = "block";
-                        setTimeout(() => { 
-                            this.ngContext?.resetForm(this.context);
-                        });
-                        
+                        setTimeout(() => {
+                            this.ngContext?.resetForm(context);
+                            that.isValid = true;
+                        }, 100);
+
                         that.toolBarAction = "style";
                     } else {
                         that.nePanelBlock.style.display = "block";
@@ -241,10 +247,10 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         }
     }
 
-    onNumberKeyPress(txt: any, event: any) {
+    onNumberKeyPress(text: any, event: any) {
         var charCode = (event.which) ? event.which : event.keyCode;
         if (charCode == 46) {
-            if (txt.indexOf('.') === -1) {
+            if (text.indexOf('.') === -1) {
                 return true;
             } else {
                 return false;
@@ -258,8 +264,9 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     }
 
     onNumberBlur(section: any, field: any, subSection: any = null) {
-        let ctrSection = this.ngContext?.controls[section] as any;
-        let ctrField = ctrSection?.controls[field] as any;
+        let ctrStyle = this.ngContext?.controls[section] as any;
+        let ctrField = ctrStyle?.controls[field] as any;
+
         if (["margin", "padding"].includes(field) && subSection != null) {
             ctrField = ctrField.controls[subSection] as any;
         }
@@ -267,10 +274,11 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         let ctrUnit = ctrField?.controls["unit"] as any;
         if (ctrValue) {
             if ((ctrValue.value || "").length > 0) {
-                ctrUnit.setValue("px");
+                ctrUnit.patchValue("px");
             } else {
-                ctrUnit.setValue("");
+                ctrUnit.patchValue("");
             }
+            ctrUnit.updateValueAndValidity();
         }
     }
 
@@ -287,10 +295,13 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         let value = this.getNumericValue(ctrValue.value || "0") + 1;
         if (value != null) {
             ctrValue.setValue(value.toString());
+            ctrValue.updateValueAndValidity({ onlySelf: true, emitEvent: true });
             if (ctrUnit.value == "") {
                 ctrUnit.setValue("px");
+                ctrUnit.updateValueAndValidity({ onlySelf: true, emitEvent: true });
             }
         }
+        this.ngContext?.form.updateValueAndValidity({ onlySelf: true, emitEvent: true });
     }
 
     onArrowDown(section: any, field: any, subSection: any = null, isNegative: any = false) {
@@ -306,28 +317,37 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
 
         if (isNegative) {
             ctrValue.setValue(value.toString());
+            ctrValue.updateValueAndValidity();
             if (ctrUnit.value == "") {
                 ctrUnit.setValue("px");
+                ctrUnit.updateValueAndValidity();
             }
         } else {
             if (value > 0) {
                 ctrValue.setValue(value.toString());
+                ctrValue.updateValueAndValidity();
                 if (ctrUnit.value == "") {
                     ctrUnit.setValue("px");
+                    ctrUnit.updateValueAndValidity();
                 }
             } else {
                 ctrValue.setValue("");
+                ctrValue.updateValueAndValidity();
                 if (ctrUnit.value != "") {
                     ctrUnit.setValue("");
+                    ctrUnit.updateValueAndValidity();
                 }
             }
-
         }
     }
 
     onContextChange(form: NgForm) {
         //this.context = form.value;
-        this.UpdateStyleContext(this.context);
+        let that = this;
+        setTimeout(() => {
+            console.log("form", form.value);
+            that.UpdateStyleContext(form.value);
+        }, 500);
     }
 
     getNumericValue(value: any) {

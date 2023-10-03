@@ -178,14 +178,14 @@ export default class Mixins {
 
     public ctrCheckbox(self: any = true, name: any = "") {
         let main = this.document.createElement("div");
-        if(self) {
+        if (self) {
             let id = this.getNewId();
             main.setAttribute("id", id);
             main.setAttribute("data-fe-highlightable", "true");
             main.setAttribute("data-fe-type", "Checkbox");
             main.setAttribute("draggable", "true");
         }
-        
+
         let ctrId = "checkbox-" + this.getNewId();
         let label = this.document.createElement("label");
         let text = this.document.createTextNode("value");
@@ -206,7 +206,7 @@ export default class Mixins {
 
     public ctrCheckbox1(self: any = true, name: any = "") {
         let id = this.getNewId();
-        
+
         let label = this.document.createElement("label");
         let text = this.document.createTextNode("value");
         label.setAttribute("for", id);
@@ -230,14 +230,14 @@ export default class Mixins {
 
     public ctrRadio(self: any = true, name: any = "") {
         let main = this.document.createElement("div");
-        if(self) {
+        if (self) {
             let id = this.getNewId();
             main.setAttribute("id", id);
             main.setAttribute("data-fe-highlightable", "true");
             main.setAttribute("data-fe-type", "Radio");
             main.setAttribute("draggable", "true");
         }
-        
+
         let ctrId = "radio-" + this.getNewId();
         let label = this.document.createElement("label");
         let text = this.document.createTextNode("value");
@@ -247,6 +247,7 @@ export default class Mixins {
         source.setAttribute("id", ctrId);
         source.setAttribute("name", name || ctrId);
         source.setAttribute("type", "radio");
+        source.value = "value";
 
         label.appendChild(source);
         label.appendChild(text);
@@ -329,47 +330,14 @@ export default class Mixins {
 
     /********/
 
-    private _GetStyleContext() {
+    _GetStyleContext(node: any = null) {
         let context = {
             id: null,
-            field: null,
             node: null,
             settings: {
-                src: null
-            },
-            general: {
-                float: null,
-                display: null,
-                position: null,
-                top: { value: "", unit: "" },
-                right: { value: "", unit: "" },
-                left: { value: "", unit: "" },
-                bottom: { value: "", unit: "" },
-            },
-            dimension: {
-                width: { value: "", unit: "" },
-                height: { value: "", unit: "" },
-                maxWidth: { value: "", unit: "" },
-                minHeight: { value: "", unit: "" },
-                margin: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" }, },
-                padding: { top: { value: "", unit: "" }, right: { value: "", unit: "" }, left: { value: "", unit: "" }, bottom: { value: "", unit: "" }, }
-            },
-            typography: {
-                font: null,
-                size: { value: "", unit: "" },
-                weight: null,
-                color: null,
-                align: null,
-                decoration: null,
-            }
-        };
-
-        let context1 = {
-            id: null,
-            field: null,
-            node: null,
-            settings: {
-                src: null
+                field: null,
+                src: null,
+                groups: [],
             },
             style: {
                 float: null,
@@ -415,142 +383,110 @@ export default class Mixins {
 
     SetCustomCSS(data: any = "") {
         try {
-            this.cstStyleJson = cssToJSON(data);
+            let styles = cssToJSON(data);
+            for (let key in styles) {
+                let style: any = this.cstStyleJson[key];
+                if (style == null) {
+                    this.cstStyleJson[key] = this.StyleToContextObject(key, styles[key]);
+                }
+            }
         } catch (error) {
             console.log("error", error);
         }
     }
 
-    ContextToStyleObject(context: any) {
-        let Style: any = {};
-        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
+    StyleToContextObject(id: any, styles: any) {
+        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "fontSize"];
         let SubUnitFields: any = ["margin", "padding"];
         let labels: any = {
             maxWidth: "max-width",
             minHeight: "min-height",
-            font: "font-family",
-            size: "font-size",
-            weight: "font-weight",
-            align: "text-align",
-            decoration: "text-decoration",
-
+            fontFamily: "font-family",
+            fontSize: "font-size",
+            fontWeight: "font-weight",
+            textAlign: "text-align",
+            textDecoration: "text-decoration",
         };
-        //"dimension", "typography", "decorations"
-        for (let section of ["general", "dimension", "typography"]) {
-            let obj = context[section];
-            for (let key in obj) {
-                let label = labels[key] || key;
-                if(["Cell"].includes(context.control) && key == "width") {
-                    label = "flex-basis";
+
+        let context: any = this._GetStyleContext();
+        context.id = id;
+        for (let key in context.style) {
+            let label = labels[key] || key;
+            let value = null;
+            if (UnitFields.includes(key)) {
+                value = styles[label] || null;
+                if (value) {
+                    let num = (value || "").replace(/[^0-9\.]+/g, "");
+                    let unit = (value || "").replace(num, "");
+                    if (num && unit) {
+                        context.style[key]["value"] = num;
+                        context.style[key]["unit"] = unit;
+                    }
                 }
-                if (obj[key]) {
-                    if (UnitFields.includes(key)) {
-                        if (obj[key]["value"] && obj[key]["unit"]) {
-                            Style[label] = obj[key]["value"] + obj[key]["unit"];
+            } else if (SubUnitFields.includes(key)) {
+                for (let subKey in context.style[key]) {
+                    let subLabel = label + "-" + subKey;
+                    value = styles[subLabel] || null;
+                    if (value) {
+                        let num = (value || "").replace(/[^0-9\.]+/g, "");
+                        let unit = (value || "").replace(num, "");
+                        if (num && unit) {
+                            context.style[key][subKey]["value"] = num;
+                            context.style[key][subKey]["unit"] = unit;
                         }
-                    } else if (SubUnitFields.includes(key)) {
-                        for (let subKey in obj[key]) {
-                            let subLabel = label;
-                            if (UnitFields.includes(subKey)) {
-                                subLabel = subLabel + "-" + subKey;
-                                if (obj[key][subKey]["value"] && obj[key][subKey]["unit"]) {
-                                    Style[subLabel] = obj[key][subKey]["value"] + obj[key][subKey]["unit"];
-                                }
+                    }
+                }
+            } else {
+                value = styles[label] || null;
+                if (value) {
+                    context.style[key] = value;
+                }
+            }
+        }
+        return context;
+    }
+
+    ContextToStyleObject() {
+        let styles: any = {};
+        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "fontSize"];
+        let SubUnitFields: any = ["margin", "padding"];
+        let labels: any = {
+            maxWidth: "max-width",
+            minHeight: "min-height",
+            fontFamily: "font-family",
+            fontSize: "font-size",
+            fontWeight: "font-weight",
+            textAlign: "text-align",
+            textDecoration: "text-decoration",
+        };
+
+        let cssStyles = JSON.parse(JSON.stringify(this.cstStyleJson));
+        for (let key in cssStyles) {
+            let style = cssStyles[key].style;
+            let id = cssStyles[key]["id"];
+            let obj: any = {};
+            for (let sub in style) {
+                let label = labels[sub] || sub;
+                if (style[sub] != null) {
+                    if (UnitFields.includes(sub)) {
+                        if (style[sub]["value"] && style[sub]["unit"]) {
+                            obj[label] = style[sub]["value"] + style[sub]["unit"];
+                        }
+                    } else if (SubUnitFields.includes(sub)) {
+                        for (let subKey in style[sub]) {
+                            let subLabel = label + "-" + subKey;
+                            if (style[sub][subKey]["value"] && style[sub][subKey]["unit"]) {
+                                obj[subLabel] = style[sub][subKey]["value"] + style[sub][subKey]["unit"];
                             }
                         }
                     } else {
-                        Style[label] = obj[key];
+                        obj[label] = style[sub];
                     }
                 }
             }
+            styles[id] = obj;
         }
-        return Style;
-    }
-
-    StyleObjectToContext(context: any, id: any, node: any, cssStyle: any) {
-        let UnitFields: any = ["top", "right", "left", "bottom", "width", "height", "maxWidth", "minHeight", "size"];
-        let SubUnitFields: any = ["margin", "padding"];
-        let labels: any = {
-            maxWidth: "max-width",
-            minHeight: "min-height",
-            font: "font-family",
-            size: "font-size",
-            weight: "font-weight",
-            align: "text-align",
-            decoration: "text-decoration"
-        };
-        //let context: any = this.GetStyleContext();
-        context.id = "#" + id;
-        context.node = node;
-
-        let custom: any = this.cstStyleJson[context.id] || {};
-
-        for (let section of ["general", "dimension", "typography"]) {
-            let obj = context[section];
-            for (let key in obj) {
-                let label = labels[key] || key;
-                if(["Cell"].includes(context.control) && key == "width") {
-                    label = "flex-basis";
-                }
-                let value = cssStyle.getPropertyValue(label);
-                if(["dimension", "typography"].includes(section)) {
-                    switch (key) {
-                        case "width":
-                            /*if(["Cell"].includes(context.control)) {
-                                value = custom[label] || value || "100%";
-                            } else {
-                                value = "";
-                            }*/
-                            value = custom[label] || "";
-                            break;
-                        case "height":
-                            value = custom[label] || "";
-                            break;
-                        case "font":
-                            value = custom[label] || "";
-                            break;
-                        case "size":
-                            value = custom[label] || "";
-                            break;
-                        case "weight":
-                            value = custom[label] || "400";
-                            break;
-                        case "align":
-                            value = custom[label] || "left";
-                            break;
-                        case "decoration":
-                            value = custom[label] || "none";
-                            break;
-                        default:
-                            value = custom[label] || value;
-                            break;
-                    }
-                }
-
-                if (UnitFields.includes(key)) {
-                    let num = value == "auto" || value == "0px" ? "" : value.replace(/[^0-9\.]+/g, "");
-                    let unit = value == "auto" || value == "0px" ? "" : value.replace(num, "");
-                    obj[key]["value"] = num;
-                    obj[key]["unit"] = unit;
-                } else if (SubUnitFields.includes(key)) {
-                    for (let subKey in obj[key]) {
-                        let subLabel = label;
-                        if (UnitFields.includes(subKey)) {
-                            subLabel = subLabel + "-" + subKey;
-                            value = cssStyle.getPropertyValue(subLabel);
-                            let num = value == "0px" ? "" : value.replace(/[^0-9\.]+/g, "");
-                            let unit = value == "0px" ? "" : value.replace(num, "");
-                            obj[key][subKey]["value"] = num;
-                            obj[key][subKey]["unit"] = unit;
-                        }
-                    }
-                } else {
-                    obj[key] = value;
-                }
-            }
-        }
-        console.log("context", context);
-        return context;
+        return styles;
     }
 
     /********/
@@ -563,8 +499,8 @@ export default class Mixins {
             styleSystem.remove();
         }
         let outerHTML = template.documentElement.outerHTML;
-        outerHTML = outerHTML.replace(/\bfe-selected\b/g,'');
-        outerHTML = outerHTML.replace(/\bfe-hovered\b/g,'');
+        outerHTML = outerHTML.replace(/\bfe-selected\b/g, '');
+        outerHTML = outerHTML.replace(/\bfe-hovered\b/g, '');
         localStorage.setItem("fe-document", outerHTML);
     }
 
