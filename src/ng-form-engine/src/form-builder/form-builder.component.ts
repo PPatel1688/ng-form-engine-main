@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { Component, ChangeDetectionStrategy, ElementRef, ViewChild, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, Directive, HostListener } from "@angular/core";
 import FrameWrapper from "../common/frameWrapper";
-import { NgForm } from "@angular/forms";
+import { FormArray, FormBuilder, FormControl, FormGroup, NgForm } from "@angular/forms";
 
 @Component({
     selector: "ng-form-builder",
@@ -25,6 +25,35 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
     public toolBarAction: any = "block";
     public isValid: any = false;
     /****/
+    public form: FormGroup;
+    public hasFieldValue: any = {
+        settings: {
+            field: false,
+            src: false,
+            groups: false,
+        },
+        style: {
+            float: false,
+            display: false,
+            position: false,
+            top: false,
+            right: false,
+            left: false,
+            bottom: false,
+            width: false,
+            height: false,
+            maxWidth: false,
+            minHeight: false,
+            margin: { top: false, right: false, left: false, bottom: false },
+            padding: { top: false, right: false, left: false, bottom: false },
+            fontFamily: false,
+            fontSize: false,
+            fontWeight: false,
+            color: false,
+            textAlign: false,
+            textDecoration: false
+        }
+    }
 
     get nePlaceHolder() {
         return this.refPlaceHolder?.nativeElement as HTMLElement;
@@ -50,8 +79,69 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         return this.selected != null;
     }
 
-    constructor(private changeDetectorRef: ChangeDetectorRef) {
+    get formSettingGroups() {
+        return (this.form.controls["settings"] as FormGroup).controls["groups"] as FormArray
+    }
+
+    constructor(fb: FormBuilder, private changeDetectorRef: ChangeDetectorRef) {
         super();
+        this.form = this.getFormGroup(fb);
+    }
+
+    getFormGroup(fb: FormBuilder) {
+        let context = fb.group({
+            id: new FormControl({ value: null, disabled: false }, []),
+            node: new FormControl({ value: null, disabled: false }, []),
+            settings: new FormGroup({
+                field: new FormControl({ value: null, disabled: false }, []),
+                src: new FormControl({ value: null, disabled: false }, []),
+                groups: new FormArray([])
+            }),
+            style: new FormGroup({
+                float: new FormControl({ value: null, disabled: false }, []),
+                display: new FormControl({ value: null, disabled: false }, []),
+                position: new FormControl({ value: null, disabled: false }, []),
+                top: this.getUVFormGroup(),
+                right: this.getUVFormGroup(),
+                left: this.getUVFormGroup(),
+                bottom: this.getUVFormGroup(),
+                width: this.getUVFormGroup(),
+                height: this.getUVFormGroup(),
+                maxWidth: this.getUVFormGroup(),
+                minHeight: this.getUVFormGroup(),
+                margin: new FormGroup({
+                    top: this.getUVFormGroup(),
+                    right: this.getUVFormGroup(),
+                    left: this.getUVFormGroup(),
+                    bottom: this.getUVFormGroup()
+                }),
+                padding: new FormGroup({
+                    top: this.getUVFormGroup(),
+                    right: this.getUVFormGroup(),
+                    left: this.getUVFormGroup(),
+                    bottom: this.getUVFormGroup()
+                }),
+                fontFamily: new FormControl({ value: null, disabled: false }, []),
+                fontSize: this.getUVFormGroup(),
+                fontWeight: new FormControl({ value: null, disabled: false }, []),
+                color: new FormControl({ value: null, disabled: false }, []),
+                textAlign: new FormControl({ value: null, disabled: false }, []),
+                textDecoration: new FormControl({ value: null, disabled: false }, [])
+            })
+        });
+        context.valueChanges.subscribe((value) => {
+            
+            
+            console.log("value", value);
+        });
+        return context;
+    }
+
+    getUVFormGroup() {
+        return new FormGroup({
+            value: new FormControl({ value: null, disabled: false }, []),
+            unit: new FormControl({ value: null, disabled: false }, []),
+        });
     }
 
     ngOnInit() {
@@ -190,6 +280,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                         that.nePanelStyle.style.display = "block";
                         setTimeout(() => {
                             this.ngContext?.resetForm(context);
+                            this.form.patchValue(context);
                             that.isValid = true;
                         }, 100);
 
@@ -206,6 +297,117 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
         console.log("action", action);
     }
 
+    hasValue(section: any, field: any) {
+        let group = this.form.value[section];
+        if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'fontSize'].includes(field)) {
+            return (group[field]["value"] || "").toString().length > 0 && group[field]["unit"] != "";
+        } else if (['margin', 'padding'].includes(field)) {
+            let keys = Object.keys(group[field]);
+            let hasValueKeys = keys.filter((x: any) => (group[field][x]["value"] || "").toString().length > 0 && group[field][x]["unit"] != null).length;
+            return hasValueKeys > 0;
+        } else {
+            return group[field] != null
+        }
+    }
+
+    hasUnitValue(section: any, field: any, subSection: any = null) {
+        let group = this.form.controls[section] as FormGroup;
+        if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'fontSize'].includes(field)) {
+            return group.get(`${field}.value`)?.value != null;
+        } else if (['margin', 'padding'].includes(field)) {
+            return group.get(`${field}.${subSection}.value`)?.value != null;
+        } else {
+            return false;
+        }
+    }
+
+    onClearValue(section: any, field: any) {
+        let group = this.form.controls[section] as FormGroup;
+        if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'fontSize'].includes(field)) {
+            group.get(`${field}.value`)?.setValue(null);
+            group.get(`${field}.unit`)?.setValue(null);
+        } else if (['margin', 'padding'].includes(field)) {
+            ['top', 'right', 'left', 'bottom'].forEach((x: any) => {
+                group.get(`${field}.${x}.value`)?.setValue(null);
+                group.get(`${field}.${x}.unit`)?.setValue(null);
+            });
+        } else {
+            group.get(field)?.setValue(null);
+        }
+    }
+
+    onNumberBlur(section: any, field: any, subSection: any = null) {
+        let group = this.form.controls[section] as FormGroup;
+        let ctrField = group?.controls[field] as FormGroup;
+        if (subSection != null) {
+            if (["margin", "padding"].includes(field)) {
+                ctrField = ctrField.get(subSection) as FormGroup;
+            }
+        }
+
+        let ctrValue = ctrField?.controls["value"] as FormControl;
+        let ctrUnit = ctrField?.controls["unit"] as FormControl;
+        if (ctrValue) {
+            if ((ctrValue.value || "").length > 0) {
+                ctrUnit.setValue("px");
+            } else {
+                ctrUnit.setValue(null);
+            }
+        }
+    }
+
+    onArrowUp(section: any, field: any, subSection: any = null, isNegative: any = false) {
+        let group = this.form.controls[section] as FormGroup;
+        let ctrField = group?.controls[field] as FormGroup;
+        if (subSection != null) {
+            if (["margin", "padding"].includes(field)) {
+                ctrField = ctrField.get(subSection) as FormGroup;
+            }
+        }
+        let ctrValue = ctrField?.controls["value"] as FormControl;
+        let ctrUnit = ctrField?.controls["unit"] as FormControl;
+        let value = this.getNumericValue(ctrValue.value || "0") + 1;
+        if (value != null) {
+            ctrValue.setValue(value.toString());
+            if (ctrUnit.value == "") {
+                ctrUnit.setValue("px");
+            }
+        }
+    }
+
+    onArrowDown(section: any, field: any, subSection: any = null, isNegative: any = false) {
+        let group = this.form.controls[section] as FormGroup;
+        let ctrField = group?.controls[field] as FormGroup;
+        if (["margin", "padding"].includes(field)) {
+            ctrField = ctrField.get(subSection) as FormGroup;
+        }
+
+        let ctrValue = ctrField?.controls["value"] as FormControl;
+        let ctrUnit = ctrField?.controls["unit"] as FormControl;
+        let value = this.getNumericValue(ctrValue.value || "0") - 1;
+
+        if (isNegative) {
+            ctrValue.setValue(value.toString());
+            if (ctrUnit.value == "") {
+                ctrUnit.setValue("px");
+            }
+        } else {
+            if (value > 0) {
+                ctrValue.setValue(value.toString());
+                ctrValue.updateValueAndValidity();
+                if (ctrUnit.value == "") {
+                    ctrUnit.setValue("px");
+                }
+            } else {
+                ctrValue.setValue("");
+                if (ctrUnit.value != "") {
+                    ctrUnit.setValue("");
+                }
+            }
+        }
+    }
+
+    /*
     hasValue(section: any, field: any) {
         if (this.context[section]) {
             if (['top', 'right', 'left', 'bottom', 'width', 'height', 'maxWidth', 'minHeight', 'size'].includes(field) && this.context[section][field]) {
@@ -339,7 +541,7 @@ export class FormBuilderComponent extends FrameWrapper implements OnInit, AfterV
                 }
             }
         }
-    }
+    }*/
 
     onContextChange(form: NgForm) {
         //this.context = form.value;

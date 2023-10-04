@@ -170,7 +170,7 @@
                     </div>
                 </div>
                 <div #refPanelStyle>
-                    <form #ngContext="ngForm" novalidate [ngFormOptions]="{ updateOn: 'change' }" (change)="onContextChange(ngContext)" *ngIf="isValid">
+                    <form [formGroup]="form">
                         <div class="fe-blocks-cs fe-one-bg fe-two-color">
                             <div class="fe-block-category">
                                 <div class="fe-sm-properties">
@@ -181,7 +181,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" readonly name="id" [(ngModel)]="context.id">
+                                                    <input type="text" readonly name="id" formControlName="id">
                                                 </span>
                                             </div>
                                         </div>
@@ -193,61 +193,63 @@
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" readonly name="node" [(ngModel)]="context.node">
+                                                    <input type="text" readonly name="node" formControlName="node">
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="fe-block-category" ngModelGroup="settings">
+                            <div class="fe-block-category" formGroupName="settings">
                                 <div class="fe-title" data-title="">
                                     Settings
                                 </div>
                                 <div class="fe-sm-properties">
-                                    <div class="fe-sm-property fe-sm-property--full" [style.display]="['Input', 'Textarea', 'Checkbox', 'Radio', 'Radio List', 'Checkbox List'].includes(context.node) ? 'block' : 'none'">
+                                    <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Mapping field </span>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" autocomplete="off" placeholder="eg. Text here" name="field" [(ngModel)]="context.settings.field">
+                                                    <input type="text" autocomplete="off" placeholder="eg. Text here" name="field" formControlName="field">
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full" [style.display]="['Image'].includes(context.node) ? 'block' : 'none'">
+                                    <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Src </span>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <input type="text" name="src" autocomplete="off" [(ngModel)]="context.settings.src">
+                                                    <input type="text" name="src" autocomplete="off" formControlName="src">
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full" [style.display]="['Radio List', 'Checkbox List'].includes(context.node) ? 'block' : 'none'">
+                                    <div class="fe-sm-property fe-sm-property--full">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Groups </span>
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-field">
                                                 <span id="fe-sm-input-holder">
-                                                    <ul>
-                                                        <li *ngFor="let item in context.settings.groups">
-                                                           {{item}}
-                                                        </li>
-                                                    </ul>
+                                                   <ul formArrayName="groups">
+                                                    <li *ngFor="let item of formSettingGroups.controls; let i = index;">
+                                                        <div [formGroupName]="i">
+                                                          
+                                                        </div>
+                                                    </li>
+                                                   </ul>
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="fe-block-category" ngModelGroup="style">
+                            <div class="fe-block-category" formGroupName="style">
                                 <div class="fe-title" data-title="">
                                     General
                                 </div>
@@ -263,15 +265,15 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none" name="float" value="none" [(ngModel)]="context.style.float">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-none" name="float" value="none" formControlName="float">
                                                         <label class="fe-radio-item-label" for="float-none"> N </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-left" name="float" value="left" [(ngModel)]="context.style.float">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-left" name="float" value="left" formControlName="float">
                                                         <label class="fe-radio-item-label" for="float-left"> L </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-right" name="float" value="right" [(ngModel)]="context.style.float">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-float" id="float-right" name="float" value="right" formControlName="float">
                                                         <label class="fe-radio-item-label" for="float-right"> R </label>
                                                     </div>
                                                 </div>
@@ -288,7 +290,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span class="fe-sm-input-holder">
-                                                    <select name="display" [(ngModel)]="context.style.display">
+                                                    <select name="display" formControlName="display">
                                                         <option value="block">block</option>
                                                         <option value="inline">inline</option>
                                                         <option value="inline-block">inline-block</option>
@@ -312,7 +314,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span class="fe-sm-input-holder">
-                                                    <select name="position" [(ngModel)]="context.style.position">
+                                                    <select name="position" formControlName="position">
                                                         <option value="static">static</option>
                                                         <option value="relative">relative</option>
                                                         <option value="absolute">absolute</option>
@@ -325,7 +327,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="top">
+                                    <div class="fe-sm-property" formGroupName="top">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Top </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'top')" (click)="onClearValue('style', 'top')">
@@ -335,11 +337,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span class="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.top.value" (keypress)="onNumberKeyPress(context.style.top.value, $event)" (blur)="onNumberBlur('style', 'top')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'top')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.top.unit" [disabled]="context.style.top.value == ''">
-                                                        <option value="" [hidden]="context.style.top.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'top')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -355,7 +356,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="right">
+                                    <div class="fe-sm-property" formGroupName="right">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Right </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'right')" (click)="onClearValue('style', 'right')">
@@ -365,11 +366,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.right.value" (keypress)="onNumberKeyPress(context.style.right.value, $event)" (blur)="onNumberBlur('style', 'right')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'right')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.right.unit" [disabled]="context.style.right.value == ''">
-                                                        <option value="" [hidden]="context.style.right.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'right')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -385,7 +385,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="left">
+                                    <div class="fe-sm-property" formGroupName="left">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Left </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'left')" (click)="onClearValue('style', 'left')">
@@ -395,11 +395,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.left.value" (keypress)="onNumberKeyPress(context.style.left.value, $event)" (blur)="onNumberBlur('style', 'left')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'left')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.left.unit" [disabled]="context.style.left.value == ''">
-                                                        <option value="" [hidden]="context.style.left.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'left')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -415,7 +414,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="bottom">
+                                    <div class="fe-sm-property" formGroupName="bottom">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Bottom </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'bottom')" (click)="onClearValue('style', 'bottom')">
@@ -425,11 +424,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.bottom.value" (keypress)="onNumberKeyPress(context.style.bottom.value, $event)" (blur)="onNumberBlur('style', 'bottom')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off"formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'bottom')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.bottom.unit" [disabled]="context.style.bottom.value == ''">
-                                                        <option value="" [hidden]="context.style.bottom.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'bottom')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -447,12 +445,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="fe-block-category" ngModelGroup="style">
+                            <div class="fe-block-category" formGroupName="style">
                                 <div class="fe-title" data-title="">
                                     Dimension
                                 </div>
                                 <div class="fe-sm-properties">
-                                    <div class="fe-sm-property" ngModelGroup="width">
+                                    <div class="fe-sm-property" formGroupName="width">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Width </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'width')" (click)="onClearValue('style', 'width')">
@@ -462,11 +460,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.width.value" (keypress)="onNumberKeyPress(context.style.width.value, $event)" (blur)="onNumberBlur('style', 'width')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value"  appNumbersOnly (blur)="onNumberBlur('style', 'width')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.width.unit" [disabled]="context.style.width.value == ''">
-                                                        <option value="" [hidden]="context.style.width.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'width')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -482,7 +479,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="height">
+                                    <div class="fe-sm-property" formGroupName="height">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Height </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'height')" (click)="onClearValue('style', 'height')">
@@ -492,11 +489,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.height.value" (keypress)="onNumberKeyPress(context.style.height.value, $event)" (blur)="onNumberBlur('style', 'height')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'height')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.height.unit" [disabled]="context.style.height.value == ''">
-                                                        <option value="" [hidden]="context.style.height.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'height')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -512,7 +508,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="maxWidth">
+                                    <div class="fe-sm-property" formGroupName="maxWidth">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Max width </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'maxWidth')" (click)="onClearValue('style', 'maxWidth')">
@@ -522,11 +518,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.maxWidth.value" (keypress)="onNumberKeyPress(context.style.maxWidth.value, $event)" (blur)="onNumberBlur('style', 'maxWidth')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'maxWidth')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.maxWidth.unit" [disabled]="context.style.maxWidth.value == ''">
-                                                        <option value="" [hidden]="context.style.maxWidth.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'maxWidth')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -542,7 +537,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="minHeight">
+                                    <div class="fe-sm-property" formGroupName="minHeight">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Min height </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'minHeight')" (click)="onClearValue('style', 'minHeight')">
@@ -552,11 +547,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.minHeight.value" (keypress)="onNumberKeyPress(context.style.minHeight.value, $event)" (blur)="onNumberBlur('style', 'minHeight')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'minHeight')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.minHeight.unit" [disabled]="context.style.minHeight.value == ''">
-                                                        <option value="" [hidden]="context.style.minHeight.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'minHeight')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -572,7 +566,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full" ngModelGroup="margin">
+                                    <div class="fe-sm-property fe-sm-property--full" formGroupName="margin">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Margin </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'margin')" (click)="onClearValue('style', 'margin')">
@@ -583,18 +577,17 @@
                                             <div class="fe-sm-field fe-sm-composite">
                                                 <span id="fe-sm-input-holder">
                                                     <div class="fe-sm-properties">
-                                                        <div class="fe-sm-property" ngModelGroup="top">
+                                                        <div class="fe-sm-property" formGroupName="top">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Top </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.margin.top.value" (keypress)="onNumberKeyPress(context.style.margin.top.value, $event)" (blur)="onNumberBlur('style', 'margin', 'top')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'margin', 'top')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.margin.top.unit" [disabled]="context.style.margin.top.value == ''">
-                                                                            <option value="" [hidden]="context.style.margin.top.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'margin', 'top')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -610,18 +603,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="right">
+                                                        <div class="fe-sm-property" formGroupName="right">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Right </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.margin.right.value" (keypress)="onNumberKeyPress(context.style.margin.right.value, $event)" (blur)="onNumberBlur('style', 'margin', 'right')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'margin', 'right')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.margin.right.unit" [disabled]="context.style.margin.right.value == ''">
-                                                                            <option value="" [hidden]="context.style.margin.right.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'margin', 'right')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -637,18 +629,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="bottom">
+                                                        <div class="fe-sm-property" formGroupName="bottom">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Bottom </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.margin.bottom.value" (keypress)="onNumberKeyPress(context.style.margin.bottom.value, $event)" (blur)="onNumberBlur('style', 'margin', 'bottom')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'margin', 'bottom')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select class="fe-input-unit" name="unit" class="fe-input-unit" [(ngModel)]="context.style.margin.bottom.unit" [disabled]="context.style.margin.bottom.value == ''">
-                                                                            <option value="" [hidden]="context.style.margin.bottom.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'margin', 'bottom')">
+                                                                        <select class="fe-input-unit" name="unit" class="fe-input-unit" formControlName="unit" >
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -664,18 +655,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="left">
+                                                        <div class="fe-sm-property" formGroupName="left">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Left </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.margin.left.value" (keypress)="onNumberKeyPress(context.style.margin.left.value, $event)" (blur)="onNumberBlur('style', 'margin', 'left')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'margin', 'left')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.margin.left.unit" [disabled]="context.style.margin.left.value == ''">
-                                                                            <option value="" [hidden]="context.style.margin.left.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'margin', 'left')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -696,7 +686,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property fe-sm-property--full" ngModelGroup="padding">
+                                    <div class="fe-sm-property fe-sm-property--full" formGroupName="padding">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Padding </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'padding')" (click)="onClearValue('style', 'padding')">
@@ -707,18 +697,17 @@
                                             <div class="fe-sm-field fe-sm-composite">
                                                 <span id="fe-sm-input-holder">
                                                     <div class="fe-sm-properties">
-                                                        <div class="fe-sm-property" ngModelGroup="top">
+                                                        <div class="fe-sm-property" formGroupName="top">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Top </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input  name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.padding.top.value" (keypress)="onNumberKeyPress(context.style.padding.top.value, $event)" (blur)="onNumberBlur('style', 'padding', 'top')">
+                                                                        <input  name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'padding', 'top')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.padding.top.unit" [disabled]="context.style.padding.top.value == ''">
-                                                                            <option value="" [hidden]="context.style.padding.top.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'padding', 'top')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -734,18 +723,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="right">
+                                                        <div class="fe-sm-property" formGroupName="right">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Right </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.padding.right.value" (keypress)="onNumberKeyPress(context.style.padding.right.value, $event)" (blur)="onNumberBlur('style', 'padding', 'right')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'padding', 'right')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.padding.right.unit" [disabled]="context.style.padding.right.value == ''">
-                                                                            <option value="" [hidden]="context.style.padding.right.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'padding', 'right')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -761,18 +749,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="bottom">
+                                                        <div class="fe-sm-property" formGroupName="bottom">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Bottom </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.padding.bottom.value" (keypress)="onNumberKeyPress(context.style.padding.bottom.value, $event)" (blur)="onNumberBlur('style', 'padding', 'bottom')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'padding', 'bottom')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.padding.bottom.unit" [disabled]="context.style.padding.bottom.value == ''">
-                                                                            <option value="" [hidden]="context.style.padding.bottom.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'padding', 'bottom')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -788,18 +775,17 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="fe-sm-property" ngModelGroup="left">
+                                                        <div class="fe-sm-property" formGroupName="left">
                                                             <div class="fe-sm-label">
                                                                 <span class="fe-sm-icon" title=""> Left </span>
                                                             </div>
                                                             <div class="fe-fields">
                                                                 <div class="fe-field fe-field-integer">
                                                                     <span id="fe-input-holder">
-                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.padding.left.value" (keypress)="onNumberKeyPress(context.style.padding.left.value, $event)" (blur)="onNumberBlur('style', 'padding', 'left')">
+                                                                        <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'padding', 'left')">
                                                                     </span>
-                                                                    <span class="fe-field-units">
-                                                                        <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.padding.left.unit" [disabled]="context.style.padding.left.value == ''">
-                                                                            <option value="" [hidden]="context.style.padding.left.value != ''">-</option>
+                                                                    <span class="fe-field-units" *ngIf="hasUnitValue('style', 'padding', 'left')">
+                                                                        <select name="unit" class="fe-input-unit" formControlName="unit">
                                                                             <option>px</option>
                                                                             <option>%</option>
                                                                             <option>em</option>
@@ -822,7 +808,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="fe-block-category" ngModelGroup="style">
+                            <div class="fe-block-category" formGroupName="style">
                                 <div class="fe-title" data-title="">
                                     Typography
                                 </div>
@@ -837,7 +823,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span id="fe-sm-input-holder">
-                                                    <select name="fontFamily" [(ngModel)]="context.style.fontFamily">
+                                                    <select name="fontFamily" formControlName="fontFamily">
                                                         <option value="Arial, Helvetica, sans-serif">Arial</option>
                                                         <option value="Arial Black, Gadget, sans-serif">Arial Black</option>
                                                         <option value="Brush Script MT, sans-serif">Brush Script MT</option>
@@ -858,7 +844,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fe-sm-property" ngModelGroup="fontSize">
+                                    <div class="fe-sm-property" formGroupName="fontSize">
                                         <div class="fe-sm-label">
                                             <span class="fe-sm-icon" title=""> Font size </span>
                                             <div class="fe-sm-clear" *ngIf="hasValue('style', 'fontSize')" (click)="onClearValue('style', 'fontSize')">
@@ -868,11 +854,10 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-field-integer">
                                                 <span id="fe-input-holder">
-                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" [(ngModel)]="context.style.fontSize.value" (keypress)="onNumberKeyPress(context.style.fontSize.value, $event)" (blur)="onNumberBlur('style', 'fontSize')">
+                                                    <input name="value" type="text" placeholder="auto" autocomplete="off" formControlName="value" appNumbersOnly (blur)="onNumberBlur('style', 'fontSize')">
                                                 </span>
-                                                <span class="fe-field-units">
-                                                    <select name="unit" class="fe-input-unit" [(ngModel)]="context.style.fontSize.unit" [disabled]="context.style.fontSize.value == ''">
-                                                        <option value="" [hidden]="context.style.fontSize.value != ''">-</option>
+                                                <span class="fe-field-units" *ngIf="hasUnitValue('style', 'fontSize')">
+                                                    <select name="unit" class="fe-input-unit" formControlName="unit">
                                                         <option>px</option>
                                                         <option>%</option>
                                                         <option>em</option>
@@ -898,7 +883,7 @@
                                         <div class="fe-fields">
                                             <div class="fe-field fe-select">
                                                 <span id="fe-sm-input-holder">
-                                                    <select name="fontWeight" [(ngModel)]="context.style.fontWeight">
+                                                    <select name="fontWeight" formControlName="fontWeight">
                                                         <option value="100">Thin</option>
                                                         <option value="200">Extra-Light</option>
                                                         <option value="300">Light</option>
@@ -925,7 +910,7 @@
                                         </div>
                                         <div class="fe-fields">
                                             <div class="fe-input-holder">
-                                                <input name="color" type="color" placeholder="black" autocomplete="off" [(ngModel)]="context.style.color">
+                                                <input name="color" type="color" placeholder="black" autocomplete="off" formControlName="color">
                                             </div>
                                         </div>
                                     </div>
@@ -940,19 +925,19 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-left" name="textAlign" value="left" [(ngModel)]="context.style.textAlign">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-left" name="textAlign" value="left" formControlName="textAlign">
                                                         <label class="fe-radio-item-label" for="align-left"> L </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-center" name="textAlign" value="center" [(ngModel)]="context.style.textAlign">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-center" name="textAlign" value="center" formControlName="textAlign">
                                                         <label class="fe-radio-item-label" for="align-center"> C </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-right" name="textAlign" value="right" [(ngModel)]="context.style.textAlign">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-right" name="textAlign" value="right" formControlName="textAlign">
                                                         <label class="fe-radio-item-label" for="align-right"> R </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-justify" name="textAlign" value="justify" [(ngModel)]="context.style.textAlign">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-align" id="align-justify" name="textAlign" value="justify" formControlName="textAlign">
                                                         <label class="fe-radio-item-label" for="align-justify"> J </label>
                                                     </div>
                                                 </div>
@@ -970,15 +955,15 @@
                                             <div class="fe-field fe-field-radio">
                                                 <div class="fe-radio-items">
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-none" name="textDecoration" value="none" [(ngModel)]="context.style.textDecoration">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-none" name="textDecoration" value="none" formControlName="textDecoration">
                                                         <label class="fe-radio-item-label" for="decoration-none"> N </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-underline" name="textDecoration" value="underline" [(ngModel)]="context.style.textDecoration">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-underline" name="textDecoration" value="underline" formControlName="textDecoration">
                                                         <label class="fe-radio-item-label" for="decoration-underline"> U </label>
                                                     </div>
                                                     <div class="fe-radio-item">
-                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-line-through" name="textDecoration" value="line-through" [(ngModel)]="context.style.textDecoration">
+                                                        <input type="radio" class="fe-sm-radio fe-sm-radio-decoration" id="decoration-line-through" name="textDecoration" value="line-through" formControlName="textDecoration">
                                                         <label class="fe-radio-item-label" for="decoration-line-through"> LT </label>
                                                     </div>
                                                 </div>

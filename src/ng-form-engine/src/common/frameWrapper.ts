@@ -436,8 +436,7 @@ export default class FrameWrapper extends Mixins {
                     let nodes = element.querySelectorAll('input');
                     if(nodes.length > 0) {
                         console.log("nodes", nodes);
-                        //settings.groups = [...nodes].map((x: any) => x.value);
-                        settings.groups.push("tets");
+                        settings.groups = [...nodes].map((x: any) => x.value);
                     }
                 }
                 break;
